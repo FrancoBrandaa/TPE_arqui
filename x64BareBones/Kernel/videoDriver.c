@@ -1,4 +1,16 @@
 #include <videoDriver.h>
+#include <stdint.h>
+
+static int cursorX = 0;
+static int cursorY = 0;
+
+#define CHAR_HEIGHT 16
+#define CHAR_SPACING 12
+#define LINE_HEIGHT 16
+#define SCREEN_WIDTH 1024
+#define SCREEN_HEIGHT 768
+#define FG_COLOR 0xFFFFFF
+#define BG_COLOR 0x000000
 
 struct vbe_mode_info_structure {
 	uint16_t attributes;		// deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
@@ -1783,7 +1795,34 @@ static void putMultPixel(uint32_t hexColor, uint64_t x, uint64_t y, int mult) {
     }
 }
 
-void drawchar(unsigned char c, int x, int y, int fgcolor, int bgcolor, int mult) {
+void putChar(char c) {
+    if (c == '\n') {
+        cursorX = 0;
+        cursorY += LINE_HEIGHT;
+    } else if (c == '\b') {
+        if (cursorX >= CHAR_SPACING) {
+            cursorX -= CHAR_SPACING;
+            drawChar(' ', cursorX, cursorY, FG_COLOR, BG_COLOR, 1);
+        } else if (cursorY > 0) {
+            cursorY -= LINE_HEIGHT;
+            cursorX = SCREEN_WIDTH - CHAR_SPACING;
+            drawChar(' ', cursorX, cursorY, FG_COLOR, BG_COLOR, 1);
+        }
+    } else {
+        drawChar(c, cursorX, cursorY, FG_COLOR, BG_COLOR, 1);
+        cursorX += CHAR_SPACING;
+        if (cursorX >= SCREEN_WIDTH - CHAR_SPACING) {
+            cursorX = 0;
+            cursorY += LINE_HEIGHT;
+        }
+    }
+
+    if (cursorY >= SCREEN_HEIGHT - LINE_HEIGHT) {
+        cursorY = 0;
+    }
+}
+
+void drawChar(unsigned char c, int x, int y, int fgcolor, int bgcolor, int mult) {
 	int mask[8]={0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01};
 	unsigned char * glyph=font_bitmap+(int)c*16;
 
