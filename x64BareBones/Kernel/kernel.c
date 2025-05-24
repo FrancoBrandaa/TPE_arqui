@@ -94,10 +94,14 @@ void * initializeKernelBinary()
 
 int main()
 {	
-	//clave no olvidar
-	load_idt(); //cargo la idt para cuando haya una interrupcion labure lo que quiero
-
-	
+	//Carga la Interrupt Descriptor Table (IDT)
+	load_idt(); //Manejo de interrupciones y syscalls
+	//Realiza un salto al código de userland
+	((EntryPoint)sampleCodeModuleAddress)();
+	//Detiene el cpu, normalmente no se ejecuta porque el userland toma el control pero es una medida
+	//de seguridad por si el userland retorna
+	haltcpu();
+    return 0;
 	// ncPrint("[Kernel Main]");
 	// ncNewline();
 	// ncPrint("  Sample code module at 0x");
@@ -115,11 +119,9 @@ int main()
 	// ncPrint((char*)sampleDataModuleAddress);
 	// ncNewline();
 
-	// ncPrint("[Finished]");
-	EntryPoint userMain = (EntryPoint)sampleCodeModuleAddress;
-	userMain();
+	// startShell();  // Iniciar shell después de init
 
-	ncPrint("<<< El control volvió del userland >>>");  // Esto no debería aparecer
+	// ncPrint("[Finished]");
 
 	//imprimir_arqui();
 	//vga_puts("habia una vez una vaca sentada en un plato de madera");
@@ -143,6 +145,6 @@ int main()
 	// --------------------------------------------------//
 	
 	//print("habia una vez una vaa sentada en un plato de madera");
-	while(1);
-	return 0;
+	//while(1);
+	//return 0;
 }

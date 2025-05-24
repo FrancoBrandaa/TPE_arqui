@@ -6,42 +6,22 @@ GLOBAL picSlaveMask
 GLOBAL haltcpu
 GLOBAL _hlt
 
+GLOBAL saveRegisters
+GLOBAL getRegisters
+GLOBAL setEscFlag
+
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
 GLOBAL _irq02Handler
 GLOBAL _irq03Handler
 GLOBAL _irq04Handler
 GLOBAL _irq05Handler
-GLOBAL _irqWriteHandler
+GLOBAL _int80Handler
 
-GLOBAL _exception0Handler
-global syscallHandlerASM
-
-extern syscallDispatcher
-EXTERN int_write
 EXTERN irqDispatcher
-EXTERN exceptionDispatcher
+EXTERN syscallDispatcher
 
 SECTION .text
-
-syscallHandlerASM:
-    ; Guardar registros que pueden ser usados por syscallDispatcher
-    push rax
-    push rdi
-    push rsi
-    push rdx
-
-    ; Llamar a syscallDispatcher(rax, rdi, rsi, rdx)
-    call syscallDispatcher
-
-    ; Restaurar los registros en orden inverso
-    pop rdx
-    pop rsi
-    pop rdi
-    pop rax
-
-    ; Volver al userland
-    iretq
 
 %macro pushState 0
 	push rax
@@ -81,6 +61,7 @@ syscallHandlerASM:
 
 %macro irqHandlerMaster 1
 	pushState
+    mov byte [esc_flag], 0
 
 	mov rdi, %1 ; pasaje de parametro
 	call irqDispatcher
@@ -90,21 +71,57 @@ syscallHandlerASM:
 	out 20h, al
 
 	popState
-	iretq
+    cmp byte [esc_flag], 1
+    jne .donot_save_registers
+    catchRegisters
+    .donot_save_registers:
+    iretq
 %endmacro
 
-
-
-%macro exceptionHandler 1
-	pushState
-
-	mov rdi, %1 ; pasaje de parametro
-	call exceptionDispatcher
-
-	popState
-	iretq
+%macro catchRegisters 0
+    mov qword [regs_backup], rax
+    mov rax, regs_backup
+    add rax, 8
+    mov qword [rax], rbx
+    add rax, 8
+    mov qword [rax], rcx
+    add rax, 8
+    mov qword [rax], rdx
+    add rax, 8
+    mov qword [rax], rdi
+    add rax, 8
+    mov qword [rax], rsi
+    add rax, 8
+    mov qword [rax], rsp
+    add rax, 8
+    mov qword [rax], rbp
+    add rax, 8
+    mov qword [rax], r8
+    add rax, 8
+    mov qword [rax], r9
+    add rax, 8
+    mov qword [rax], r10
+    add rax, 8
+    mov qword [rax], r11
+    add rax, 8
+    mov qword [rax], r12
+    add rax, 8
+    mov qword [rax], r13
+    add rax, 8
+    mov qword [rax], r14
+    add rax, 8
+    mov qword [rax], r15
+    add rax, 8
+    mov qword rdi, [rsp]      ; rip
+    mov qword [rax], rdi
+    add rax, 8
+    mov qword rdi, [rsp+8]    ; cs
+    mov qword [rax], rdi
+    add rax, 8
+    mov qword rdi, [rsp+16]   ; rflags
+    mov qword [rax], rdi
+    mov byte [registers_saved], 1   ; seteo flag de que se guardaron registros [ESTO ESTABA MAL]
 %endmacro
-
 
 _hlt:
 	sti
@@ -161,27 +178,44 @@ _irq04Handler:
 _irq05Handler:
 	irqHandlerMaster 5
 
-_irqWriteHandler:
-	pushState
+_int80Handler:
+	
+	mov r9, r8
+	mov r8, r10
+	mov rcx, rdx
+	mov rdx, rsi
+	mov rsi, rdi 
+	mov rdi, rax
+	
+	call syscallDispatcher
 
-	call int_write
-
-	; signal pic EOI (End of Interrupt)
-	mov al, 20h
-	out 20h, al
-
-	popState
 	iretq
-;Zero Division Exception
-_exception0Handler:
-	exceptionHandler 0
 
 haltcpu:
 	cli
 	hlt
 	ret
 
+saveRegisters:
+    catchRegisters
+    ret
 
+getRegisters:
+    mov rax, 0       ; ret null
+    cmp byte [registers_saved], 1
+    jne .not_saved
+    mov rax, regs_backup
+.not_saved:
+    ret
 
-SECTION .bss
-	aux resq 1
+setEscFlag:
+    mov byte [esc_flag], 1
+    ret
+
+section .rodata
+    userland equ 0x400000
+    registers_saved db 0
+
+section .bss
+    esc_flag resb 1
+    regs_backup resq 19

@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "keyboard.h": "c",
-        "random": "c"
+        "random": "c",
+        "stdint.h": "c",
+        "naiveconsole.h": "c"
     }
 }

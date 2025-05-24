@@ -4,7 +4,13 @@
 
 static int isShiftPressed = 0;
 
+#define CHAR_BUFFER_DIM 64
+#define NOT_KEY -2
 #define BUFFER_SIZE 256
+
+static char charBuffer[CHAR_BUFFER_DIM] = {0};
+static char charsAtBuffer=0;
+static char getterIndex=0;
 
 static char keyBuffer[BUFFER_SIZE];
 static int bufferHead = 0;
@@ -48,7 +54,7 @@ void keyboard_handler() {
             if (next != bufferTail) {
                 keyBuffer[bufferHead] = ascii;
                 bufferHead = next;
-                //putChar(ascii);  // Solo para debug
+                putChar(ascii);  // Solo para debug
             }
         }
     }
@@ -61,4 +67,20 @@ char getChar() {
     char c = keyBuffer[bufferTail];
     bufferTail = (bufferTail + 1) % BUFFER_SIZE;
     return c;
+}
+
+char hasNextKey() {
+    return charsAtBuffer > 0;
+}
+
+int nextKey() {
+    int ret;
+    if (!hasNextKey()) {
+        return NOT_KEY;
+    }
+    charsAtBuffer--;
+    ret = charBuffer[getterIndex];
+    getterIndex++;
+    getterIndex = getterIndex % CHAR_BUFFER_DIM;
+    return ret;
 }
