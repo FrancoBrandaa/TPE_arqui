@@ -101,7 +101,6 @@ int main()
 	//Detiene el cpu, normalmente no se ejecuta porque el userland toma el control pero es una medida
 	//de seguridad por si el userland retorna
 	haltcpu();
-    return 0;
 	// ncPrint("[Kernel Main]");
 	// ncNewline();
 	// ncPrint("  Sample code module at 0x");
@@ -127,24 +126,6 @@ int main()
 	//vga_puts("habia una vez una vaca sentada en un plato de madera");
 
 
-	// EJERCICIO 3 --------------------------------------//
-	// while(1){
-	
-	// ncClear();
-	// ncPrint("HORAS: ");
-	// char a = read_hours();
-	// ncPrintHex(a);
-	// ncPrint(" MINUTOS: ");
-	// char b = read_minutes();
-	// ncPrintHex(b);
-	// ncPrint(" SEGUNDOS: ");
-	// char c = read_sec(); 
-	// ncPrintHex(c);   //  basicamente me lo dan en exa el resultado
-	// //ncNewline();
-	// }
-	// --------------------------------------------------//
-	
-	//print("habia una vez una vaa sentada en un plato de madera");
-	//while(1);
-	//return 0;
+
+	return 0;	
 }

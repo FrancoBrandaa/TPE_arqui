@@ -9,8 +9,10 @@ extern uint64_t * getRegisters();
 #define SYSNUM_READ 0
 #define SYSNUM_WRITE 1
 #define SYSNUM_SET_CURSOR 5
+#define SYSNUM_DRAW_RECTANGLE 6
 #define SYSNUM_SET_FONT_COLOR 7
 #define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
+
 
 #define COLOR_WHITE 0xFFFFFF
 #define COLOR_BLACK 0x000000
@@ -32,7 +34,12 @@ void setFontColor(uint32_t hexColor) {
     color = hexColor;
 }
 
-void changeBackgroundColor(uint32_t hexColor) {
+void getCursor(int *x, int *y) {
+    *x = cursorX;
+    *y = cursorY;
+}
+
+void changeBackgroundColor(uint32_t hexColor) {  
     backgroundColor = hexColor;
 }
 
@@ -98,6 +105,11 @@ void syscallDispatcher(uint64_t rax, ...) {
     }  else if (rax == SYSNUM_SET_BACKGROUND_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
         changeBackgroundColor(hexColor);
+    }else if(rax == SYSNUM_DRAW_RECTANGLE){
+        Point* x = va_arg(args, Point*);
+        Point* y = va_arg(args, Point*);
+        uint32_t hexColor = va_arg(args, uint32_t);
+        drawRectangle(x, y, hexColor); //llamo directo a la fun del driver
     }
     va_end(args);
     return ret;

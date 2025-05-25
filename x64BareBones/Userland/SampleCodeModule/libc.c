@@ -1,4 +1,4 @@
-#include <libc.h>
+#include "./include/libc.h"
 #include <libasm.h>
 typedef enum{
     STDIN = 0,
@@ -10,6 +10,7 @@ typedef enum{
 #define SET_CURSOR 5
 #define SET_FONT_COLOR 7
 #define SET_BACKGROUND_FONT_COLOR 10
+#define DRAW_RECTANGLE 6
 
 void setFontColor(uint32_t hexColor) {
 	sys_call(SET_FONT_COLOR, hexColor, 0, 0, 0);
@@ -18,8 +19,13 @@ void setBackGroundColor(uint32_t hexColor) {
     sys_call(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0, 0);
 }
 
+
 void nprint(const char * buf, uint64_t lenght) {
 	sys_call(WRITE, STDOUT, (uint64_t) buf, (uint64_t) lenght, 0);
+}
+
+void drawRectangle(Point* topLeft, Point* downRigth, uint32_t color){
+    sys_call(DRAW_RECTANGLE, topLeft, downRigth, color, 0);
 }
 
 void print(const char * buf) {
@@ -89,6 +95,8 @@ void setCursor(uint32_t x, uint32_t y) {
     sys_call(SET_CURSOR, x, y, 0, 0);
 }
 
+
+
 void setCharCursor(uint32_t x, uint32_t y) {
     setCursor(x*BASE_CHAR_WIDTH, y*BASE_CHAR_HEIGHT);
 }
@@ -103,3 +111,6 @@ char* strNCpy(const char *src, char *dest, int n) {
     }
     return dest;
 }
+
+
+
