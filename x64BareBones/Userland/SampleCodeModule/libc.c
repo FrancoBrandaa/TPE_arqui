@@ -24,8 +24,8 @@ void nprint(const char * buf, uint64_t lenght) {
 	sys_call(WRITE, STDOUT, (uint64_t) buf, (uint64_t) lenght, 0);
 }
 
-void drawRectangle(Point* topLeft, Point* downRigth, uint32_t color){
-    sys_call(DRAW_RECTANGLE, topLeft, downRigth, color, 0);
+void drawRectangle(Point topLeft, Point downRigth, uint32_t color){
+    sys_call(DRAW_RECTANGLE, (uint64_t)&topLeft, (uint64_t)&downRigth, (uint64_t)color, 0);
 }
 
 void print(const char * buf) {

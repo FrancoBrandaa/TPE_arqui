@@ -2,10 +2,13 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <libc.h>
+
+
 int strcmp(const char* s1, const char* s2);
 void printString(const char* str);
 int strncmp(const char* s1, const char* s2, size_t n);
 void runCommand(const char *input) {
+    setCursor(COMMAND_LINE_X, COMMAND_LINE_Y_exec); 
     if (strcmp(input, "help") == 0) {
         print("Comandos disponibles:\n");
         print(" - help\n");

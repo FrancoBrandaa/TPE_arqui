@@ -4,13 +4,13 @@
 
 static int isShiftPressed = 0;
 
-#define CHAR_BUFFER_DIM 64
+//#define CHAR_BUFFER_DIM 64
 #define NOT_KEY -2
 #define BUFFER_SIZE 256
 
-static char charBuffer[CHAR_BUFFER_DIM] = {0};
-static char charsAtBuffer=0;
-static char getterIndex=0;
+//static char charBuffer[CHAR_BUFFER_DIM] = {0};
+//static char charsAtBuffer=0;
+//static char getterIndex=0;
 
 static char keyBuffer[BUFFER_SIZE];
 static int bufferHead = 0;
@@ -50,37 +50,36 @@ void keyboard_handler() {
         char ascii = isShiftPressed ? shift_ascii[scancode] : scancode_to_ascii[scancode];
         
         if (ascii != 0) {
-            int next = (bufferHead + 1) % BUFFER_SIZE;
+            int next = (bufferHead + 1) % BUFFER_SIZE; //RARO ESTO
             if (next != bufferTail) {
                 keyBuffer[bufferHead] = ascii;
                 bufferHead = next;
-                putChar(ascii);  // Solo para debug
+                //putChar(ascii);  // Solo para debug
             }
         }
     }
 }
 
-char getChar() {
-    // Espera activa hasta que haya una tecla
-    while (bufferHead == bufferTail);  // bloqueante
-
-    char c = keyBuffer[bufferTail];
-    bufferTail = (bufferTail + 1) % BUFFER_SIZE;
-    return c;
-}
+// NO SE PARA QUE ESTABA ESTA FUNCION POR ESO POR LAS DUDAS COMENTO
+// char getChar() {
+//     // Busy-wait until a key is available
+//     while (bufferHead == bufferTail);
+//     char c = keyBuffer[bufferTail];
+//     bufferTail = (bufferTail + 1) % BUFFER_SIZE;
+//     return c;
+// }
 
 char hasNextKey() {
-    return charsAtBuffer > 0;
+    // Non-blocking check for pending keys
+    return (bufferHead != bufferTail);
 }
 
 int nextKey() {
-    int ret;
+    // Return next key or NOT_KEY if buffer is empty
     if (!hasNextKey()) {
         return NOT_KEY;
     }
-    charsAtBuffer--;
-    ret = charBuffer[getterIndex];
-    getterIndex++;
-    getterIndex = getterIndex % CHAR_BUFFER_DIM;
-    return ret;
+    char c = keyBuffer[bufferTail];
+    bufferTail = (bufferTail + 1) % BUFFER_SIZE;
+    return c;
 }

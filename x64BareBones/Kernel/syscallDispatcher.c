@@ -34,10 +34,10 @@ void setFontColor(uint32_t hexColor) {
     color = hexColor;
 }
 
-void getCursor(int *x, int *y) {
-    *x = cursorX;
-    *y = cursorY;
-}
+// void getCursor(int *x, int *y) {
+//     *x = cursorX;
+//     *y = cursorY;
+// }
 
 void changeBackgroundColor(uint32_t hexColor) {  
     backgroundColor = hexColor;
@@ -110,6 +110,7 @@ void syscallDispatcher(uint64_t rax, ...) {
         Point* y = va_arg(args, Point*);
         uint32_t hexColor = va_arg(args, uint32_t);
         drawRectangle(x, y, hexColor); //llamo directo a la fun del driver
+        ret = 0;
     }
     va_end(args);
     return ret;

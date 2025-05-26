@@ -11,6 +11,19 @@
 
 #define NULL (void*)0
 
+#define zoom_user 1
+
+
+#define CHAR_WIDTH (BASE_CHAR_WIDTH*zoom_user)       // Ancho de un char actual [EN PIXELES]
+#define CHAR_HEIGHT (BASE_CHAR_HEIGHT*zoom_user)     // Alto de un char actual [EN PIXELES]
+
+#define DIM_CHAR_Y (DIM_Y/CHAR_HEIGHT)      // Ancho de pantalla [EN CHARS ACTUALES]
+#define DIM_CHAR_X (DIM_X/CHAR_WIDTH)       // Alto de pantalla [EN CHARS ACTUALES]
+#define COMMAND_LINE_X (2*BASE_CHAR_WIDTH)            // Pos de x de la linea de comandos [EN PIXELES]
+#define COMMAND_LINE_Y (DIM_Y-(2*CHAR_HEIGHT))        // Pos de y de la linea de comandos [EN PIXELES]
+#define COMMAND_LINE_Y_exec (DIM_Y-(20*CHAR_HEIGHT))        // Pos de y de la linea de comandos [EN PIXELES]
+
+
 #define DIM_X 1024          // Ancho de pantalla [EN PIXELES]
 #define DIM_Y 768           // Alto de pantalla [EN PIXELES]
 
@@ -43,8 +56,17 @@ typedef struct {
  * @return uint64_t Number of ticks.
  */
 uint64_t getTicks();
+/**
+ * @brief Draws a rectangle on the screen.
+ * 
+ * @param topLeft Pointer to a Point structure representing the top-left corner of the rectangle.
+ * @param downRigth Pointer to a Point structure representing the bottom-right corner of the rectangle.
+ * @param color The color of the rectangle in hexadecimal format.
+ * 
+ * @return void
+ */
 
-
+void drawRectangle(Point topLeft, Point downRigth, uint32_t color);
 /**
  * @brief Displays the current saved values of the CPU registers.
  */
