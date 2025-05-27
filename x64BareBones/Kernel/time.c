@@ -23,7 +23,7 @@ static dateStruct date;
 dateStruct * get_time () {
     date.sec = get_secs();
     date.min = get_mins();
-    date.hour = get_hours(); 
+    date.hour = get_hours(); // Ajuste de huso horario
     date.day = get_day();
     date.month = get_month();
     date.year = get_year();

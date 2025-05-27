@@ -99,11 +99,11 @@ void initializeShell()
                     // Execute the command
                     int num_comando = runCommand(command);
 
-                     if (num_comando == 2)// "clear"
-                     {
-                            PRINT_PROMPT();
-                            break; // If the command was "clear", we dont want to display a newline
-                     }
+                    if (num_comando == 2)// "clear"
+                    {
+                        PRINT_PROMPT();
+                        break; // If the command was "clear", we dont want to display a newline
+                    }
                     
                     // Move to the next line for the new prompt
                     cursorY += 2 * CHAR_HEIGHT; // Give some space between commands

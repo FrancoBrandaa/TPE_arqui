@@ -3,6 +3,7 @@
         "keyboard.h": "c",
         "random": "c",
         "stdint.h": "c",
-        "naiveconsole.h": "c"
+        "naiveconsole.h": "c",
+        "commands.h": "c"
     }
 }

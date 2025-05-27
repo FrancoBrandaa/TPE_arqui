@@ -24,7 +24,7 @@ dateStruct * getDate () {
 }
 
 void timeToStr(char * buffer) { 
-    dateStruct * date = getTime();
+    dateStruct * date = getDate();
     strCpy("dd/mm/yy 00:00:00", buffer);
     char aux[3] = {0x00};
     itoa(date->day, aux, 16, 2);
@@ -33,7 +33,7 @@ void timeToStr(char * buffer) {
     strNCpy(aux, buffer+3, 2);
     itoa(date->year, aux, 16, 2);
     strNCpy(aux, buffer+6, 2);
-    itoa(date->hour, aux, 16, 2);
+    itoa(date->hour, aux, 16, 2); //LA HORA ESTA CORRIDA 5 HORAS, VER COMO FIXEAR
     strNCpy(aux, buffer+9, 2);
     itoa(date->min, aux, 16, 2);
     strNCpy(aux, buffer+12, 2);
@@ -41,10 +41,12 @@ void timeToStr(char * buffer) {
     strNCpy(aux, buffer+15, 2);
 }
 
-void printDate(){
+int printDate(){
     char buffer [17] = {0}; // dd/mm/yy hh:mm:ss
     timeToStr(buffer);
     print(buffer);
+    putChar('\n');     // ← ¡salto de línea después de la fecha!
+    return 4;
 }
 
 void nprint(const char * buf, uint64_t lenght) {
