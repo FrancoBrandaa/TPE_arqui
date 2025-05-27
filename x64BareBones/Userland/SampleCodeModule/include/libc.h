@@ -6,10 +6,11 @@
 #ifndef _LIBC_H_
 #define _LIBC_H_
 #include <stdint.h>
+#include <stddef.h>
 // #include <libasm.h>
 // #include <random.h>
 
-#define NULL (void*)0
+//#define NULL (void*)0
 
 #define zoom_user 1
 
@@ -21,7 +22,7 @@
 #define DIM_CHAR_X (DIM_X/CHAR_WIDTH)       // Alto de pantalla [EN CHARS ACTUALES]
 #define COMMAND_LINE_X (2*BASE_CHAR_WIDTH)            // Pos de x de la linea de comandos [EN PIXELES]
 #define COMMAND_LINE_Y (DIM_Y-(2*CHAR_HEIGHT))        // Pos de y de la linea de comandos [EN PIXELES]
-#define COMMAND_LINE_Y_exec (DIM_Y-(20*CHAR_HEIGHT))        // Pos de y de la linea de comandos [EN PIXELES]
+#define COMMAND_LINE_Y_exec (DIM_Y-(20*CHAR_HEIGHT))        // Pos de y del comando en la shell [EN PIXELES]
 
 
 #define DIM_X 1024          // Ancho de pantalla [EN PIXELES]
@@ -41,15 +42,26 @@ typedef struct {
 	int y;
 }Point;
 
-typedef struct {
+
+typedef enum{
+    STDIN = 0,
+    STDOUT,
+    STDERR,
+} FDS;
+
+typedef struct dateStruct {
+    char sec;
+    char min;
+    char hour;
     char day;
     char month;
     char year;
-    char hour;
-    char min;
-    char sec;
-} time;
+} dateStruct;
 
+
+
+
+dateStruct * getDate ();
 /**
  * @brief Retrieves the number of ticks since the system started.
  * 
@@ -77,7 +89,7 @@ void showRegisters();
  * 
  * @return time* Pointer to a time structure containing the current time.
  */
-time * getTime();
+dateStruct * getDate();
 
 /**
  * @brief Sets the background color of the display.
@@ -166,6 +178,15 @@ void setCursor(uint32_t x, uint32_t y);
  * @param y The y-coordinate of the character cursor.
  */
 void setCharCursor(uint32_t x, uint32_t y);
+
+
+
+int strcmp(const char* s1, const char* s2);
+
+
+
+int strncmp(const char* s1, const char* s2, size_t n);
+
 
 /**
  * @brief Copies up to n characters from source to destination.

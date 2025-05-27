@@ -1,20 +1,32 @@
-
 #include <time.h>
 #include <naiveConsole.h>
 
 static unsigned long ticks = 0;
 
-void timer_handler() {
+//Cada vez que interrumpe cada 55mS entra aca y suma un tick
+void timer_handler() 
+{
 	ticks++;
-    if (ticks % 90 == 0) {
-        ncPrint("Pasaron 5 segundos\n");
-    }
 }
 
-int ticks_elapsed() {
+int ticks_count() {
 	return ticks;
 }
 
-int seconds_elapsed() {
+//Cada 18 ticks es 1 segundo entonces ticks / 18 te da la cantidad de segundos transcurridos
+int seconds_count() {
 	return ticks / 18;
 }
+
+static dateStruct date;
+
+dateStruct * get_time () {
+    date.sec = get_secs();
+    date.min = get_mins();
+    date.hour = get_hours(); 
+    date.day = get_day();
+    date.month = get_month();
+    date.year = get_year();
+    return &date;
+}
+

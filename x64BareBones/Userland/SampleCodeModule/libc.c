@@ -1,12 +1,11 @@
 #include "./include/libc.h"
 #include <libasm.h>
-typedef enum{
-    STDIN = 0,
-    STDOUT,
-    STDERR,
-} FDS;
+
+
+#define STRING_MAX_LENGTH 1024
 #define READ 0
 #define WRITE 1
+#define GET_DATE 2
 #define SET_CURSOR 5
 #define SET_FONT_COLOR 7
 #define SET_BACKGROUND_FONT_COLOR 10
@@ -18,7 +17,35 @@ void setFontColor(uint32_t hexColor) {
 void setBackGroundColor(uint32_t hexColor) {
     sys_call(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0, 0);
 }
+//definir el struct en lib.h
+dateStruct * getDate () {
+    dateStruct * date = sys_call(GET_DATE, 0, 0, 0, 0);
+    return date;
+}
 
+void timeToStr(char * buffer) { 
+    dateStruct * date = getTime();
+    strCpy("dd/mm/yy 00:00:00", buffer);
+    char aux[3] = {0x00};
+    itoa(date->day, aux, 16, 2);
+    strNCpy(aux, buffer, 2);
+    itoa(date->month, aux, 16, 2);
+    strNCpy(aux, buffer+3, 2);
+    itoa(date->year, aux, 16, 2);
+    strNCpy(aux, buffer+6, 2);
+    itoa(date->hour, aux, 16, 2);
+    strNCpy(aux, buffer+9, 2);
+    itoa(date->min, aux, 16, 2);
+    strNCpy(aux, buffer+12, 2);
+    itoa(date->sec, aux, 16, 2);
+    strNCpy(aux, buffer+15, 2);
+}
+
+void printDate(){
+    char buffer [17] = {0}; // dd/mm/yy hh:mm:ss
+    timeToStr(buffer);
+    print(buffer);
+}
 
 void nprint(const char * buf, uint64_t lenght) {
 	sys_call(WRITE, STDOUT, (uint64_t) buf, (uint64_t) lenght, 0);
@@ -101,6 +128,12 @@ void setCharCursor(uint32_t x, uint32_t y) {
     setCursor(x*BASE_CHAR_WIDTH, y*BASE_CHAR_HEIGHT);
 }
 
+void strCpy(char * source, char * dest) {
+    while ((*(dest++) = *(source++)) != '\0') {
+        ;
+    }
+}
+
 char* strNCpy(const char *src, char *dest, int n) {
     int i;
     for (i = 0; i < n && src[i] != '\0'; i++) {
@@ -113,4 +146,23 @@ char* strNCpy(const char *src, char *dest, int n) {
 }
 
 
+
+int strcmp(const char* s1, const char* s2) {
+    while (*s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+    }
+    return *(unsigned char*)s1 - *(unsigned char*)s2;
+}
+
+
+
+int strncmp(const char* s1, const char* s2, size_t n) {
+    while (n && *s1 && (*s1 == *s2)) {
+        s1++;
+        s2++;
+        n--;
+    }
+    return n ? *(unsigned char*)s1 - *(unsigned char*)s2 : 0;
+}
 

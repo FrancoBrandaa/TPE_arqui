@@ -4,6 +4,6 @@
 
        // Pos de y de la linea de comandos [EN PIXELES]
 
-void runCommand(const char *input);
+int runCommand(const char *input);
 
 #endif

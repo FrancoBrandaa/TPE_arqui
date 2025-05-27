@@ -12,6 +12,7 @@ extern uint64_t * getRegisters();
 #define SYSNUM_DRAW_RECTANGLE 6
 #define SYSNUM_SET_FONT_COLOR 7
 #define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
+#define GET_DATE 2
 
 
 #define COLOR_WHITE 0xFFFFFF
@@ -111,6 +112,8 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint32_t hexColor = va_arg(args, uint32_t);
         drawRectangle(x, y, hexColor); //llamo directo a la fun del driver
         ret = 0;
+    }else if(rax == GET_DATE){
+        ret = get_time();
     }
     va_end(args);
     return ret;

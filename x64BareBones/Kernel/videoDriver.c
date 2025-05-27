@@ -1843,7 +1843,8 @@ void drawRectangle(Point* topLeft, Point* downRigth, uint32_t c){
 
 
 
-void drawCircle(int centerX, int centerY, int radius, uint32_t color) {
+void drawCircle(int centerX, int centerY, int radius, uint32_t color) 
+{
     int x = radius;
     int y = 0;
     int err = 0;
