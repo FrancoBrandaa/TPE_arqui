@@ -7,6 +7,8 @@ int strcmp(const char* s1, const char* s2);
 void printString(const char* str);
 int strncmp(const char* s1, const char* s2, size_t n);
 
+//NO SE COMO FUNCIONA INCURSOR SI NO SE INCLUYE SHELL.H
+
 int runCommand(const char *input) 
 {
     //setCursor(COMMAND_LINE_X, COMMAND_LINE_Y_exec); 
@@ -38,6 +40,14 @@ int runCommand(const char *input)
     {
         printDate();
         return 4;
+    }
+
+    if (strcmp(input, "div0")==0) {
+        _div();
+    }
+    
+    if (strcmp(input, "inp")==0) {
+        _ioe();
     }
     
     print("Comando no reconocido\n");

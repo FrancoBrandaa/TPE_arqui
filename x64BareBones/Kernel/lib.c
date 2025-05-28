@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <lib.h>
 
 void * memset(void * destination, int32_t c, uint64_t length)
 {
@@ -47,4 +48,65 @@ void * memcpy(void * destination, const void * source, uint64_t length)
 	}
 
 	return destination;
+}
+
+int itoa(uint64_t value, char * buffer, int base, int n) {
+    char *p = buffer;
+	char *p1, *p2;
+	uint32_t digits = 0;
+	do {
+		uint32_t remainder = value % base;
+		*p++ = (remainder < 10) ? remainder + '0' : remainder + 'A' - 10;
+		digits++;
+    } while (value /= base);
+    n -= digits;
+    while (n-- > 0) {
+        *p++ = '0';
+    }
+    *p = 0x00;
+	p1 = buffer;
+	p2 = p - 1;
+	while (p1 < p2) {
+		char tmp = *p1;
+		*p1 = *p2;
+		*p2 = tmp;
+		p1++;
+		p2--;
+	}
+	return digits;
+}
+
+char* strNCpy(const char *src, char *dest, int n) {
+    int i;
+    for (i = 0; i < n && src[i] != '\0'; i++) {
+        dest[i] = src[i];
+    }
+    for (; i < n; i++) {
+        dest[i] = '\0';
+    }
+    return dest;
+}
+
+int strLen(char * str) {
+    int i = 0;
+    while (str[i++] != '\0') {
+        ;
+    }
+    return i;
+}
+
+
+
+//agrandar el texto antes de llamar
+void showRegisters() {
+   // sys_setZoom(2);
+    uint64_t * reg = getRegisters();
+    char  strs[][4] = {"rax:", "rbx:", "rcx:", "rdx:", "rdi:", "rsi:", "rsp:", "rbp:", "r8: ", "r9: ", "r10:", "r11:", "r12:", "r13:", "r14:", "r15:", "rip:", "cs: ", "rfl:"};
+    char * buf = "\tRRRR 0xHHHHHHHHHHHHHHHH\n";
+    for (int i = 0; i < 19; i++) {
+        strNCpy(strs[i], buf+1, 4);
+        itoa(reg[i], buf+8, 16, 16);
+        buf[24] = '\n';
+        sys_write(STDERR, buf, 25);
+    }
 }

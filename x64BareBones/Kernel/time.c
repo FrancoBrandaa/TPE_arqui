@@ -30,3 +30,11 @@ dateStruct * get_time () {
     return &date;
 }
 
+//in seconds
+void sleep(int ticksToWait) {
+    unsigned long start = ticks  ; 
+    while (ticks - start < ticksToWait*18){ // Convert ticks to seconds,  ticksToWait*18
+        _hlt();
+    };
+}
+

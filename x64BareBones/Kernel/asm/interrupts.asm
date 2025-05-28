@@ -16,10 +16,15 @@ GLOBAL _irq02Handler
 GLOBAL _irq03Handler
 GLOBAL _irq04Handler
 GLOBAL _irq05Handler
+GLOBAL _exception0Handler
+GLOBAL _exception6Handler
 GLOBAL _int80Handler
 
+EXTERN getStackBase  ;esta en el kernel con su explicacion
+EXTERN showRegisters  ;buscarla noc donde esta
 EXTERN irqDispatcher
 EXTERN syscallDispatcher
+EXTERN exceptionDispatcher
 
 SECTION .text
 
@@ -123,6 +128,21 @@ SECTION .text
     mov byte [registers_saved], 1   ; seteo flag de que se guardaron registros [ESTO ESTABA MAL]
 %endmacro
 
+
+%macro exceptionHandler 1
+    catchRegisters
+
+	mov rdi, %1 ; pasaje de parametro
+	call exceptionDispatcher
+
+    call getStackBase
+    mov [rsp+8*3], rax
+    mov rax, userland
+    mov [rsp], rax
+    iretq
+%endmacro
+
+
 _hlt:
 	sti
 	hlt
@@ -177,6 +197,14 @@ _irq04Handler:
 ;USB
 _irq05Handler:
 	irqHandlerMaster 5
+
+;Zero Division Exception
+_exception0Handler:
+	exceptionHandler 0
+
+;Zero Division Exception
+_exception6Handler:
+	exceptionHandler 6
 
 _int80Handler:
 	

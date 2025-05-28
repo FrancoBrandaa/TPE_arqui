@@ -7,6 +7,7 @@
 #define _LIBC_H_
 #include <stdint.h>
 #include <stddef.h>
+#include <libasm.h>
 // #include <libasm.h>
 // #include <random.h>
 
@@ -59,7 +60,7 @@ typedef struct dateStruct {
 } dateStruct;
 
 
-
+void SLEEP(uint64_t seconds);
 
 dateStruct * getDate ();
 /**

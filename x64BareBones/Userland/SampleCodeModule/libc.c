@@ -1,5 +1,5 @@
 #include "./include/libc.h"
-#include <libasm.h>
+
 
 
 #define STRING_MAX_LENGTH 1024
@@ -10,6 +10,7 @@
 #define SET_FONT_COLOR 7
 #define SET_BACKGROUND_FONT_COLOR 10
 #define DRAW_RECTANGLE 6
+#define SLEEP 32
 
 void setFontColor(uint32_t hexColor) {
 	sys_call(SET_FONT_COLOR, hexColor, 0, 0, 0);
@@ -56,6 +57,10 @@ void nprint(const char * buf, uint64_t lenght) {
 
 void drawRectangle(Point topLeft, Point downRigth, uint32_t color){
     sys_call(DRAW_RECTANGLE, (uint64_t)&topLeft, (uint64_t)&downRigth, (uint64_t)color, 0);
+}
+
+void sleep(uint64_t seconds){
+    sys_call(SLEEP,seconds, 0);
 }
 
 void print(const char * buf) {

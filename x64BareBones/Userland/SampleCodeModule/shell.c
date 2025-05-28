@@ -70,6 +70,7 @@ void cleanScreen()
 
 void shell()
 {
+    cleanScreen();
     setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, COMMAND_LINE_Y - 4 * CHAR_HEIGHT);
 
     initializeShell();

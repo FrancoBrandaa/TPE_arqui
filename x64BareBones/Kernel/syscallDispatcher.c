@@ -13,6 +13,7 @@ extern uint64_t * getRegisters();
 #define SYSNUM_SET_FONT_COLOR 7
 #define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
 #define GET_DATE 2
+#define SYSNUM_SLEEP 32
 
 
 #define COLOR_WHITE 0xFFFFFF
@@ -61,6 +62,10 @@ void sys_write(FDS fd, const char *buf, size_t count) {
         }
     }
     return;
+}
+
+void sys_sleep(int seconds){
+    sleep(seconds);
 }
 
 uint32_t readChars(char * buf, size_t count) {
@@ -114,6 +119,9 @@ void syscallDispatcher(uint64_t rax, ...) {
         ret = 0;
     }else if(rax == GET_DATE){
         ret = get_time();
+    }else if (rax == SYSNUM_SLEEP) {
+        int seconds = va_arg(args, int);
+        sys_sleep(seconds);    
     }
     va_end(args);
     return ret;
