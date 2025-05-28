@@ -1,4 +1,4 @@
-
+#include <syscallDispatcher.h>
 #include <videoDriver.h>
 #include <lib.h>
 #define ZERO_EXCEPTION_ID 0
