@@ -105,6 +105,7 @@ void initializeShell()
                         break; // If the command was "clear", we dont want to display a newline
                     }
                     
+
                     // Move to the next line for the new prompt
                     cursorY += 2 * CHAR_HEIGHT; // Give some space between commands
 

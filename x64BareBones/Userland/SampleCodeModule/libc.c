@@ -41,12 +41,13 @@ void timeToStr(char * buffer) {
     strNCpy(aux, buffer+15, 2);
 }
 
-int printDate(){
-    char buffer [17] = {0}; // dd/mm/yy hh:mm:ss
+void printDate(){
+
+    // sizeof("dd/mm/yy 00:00:00") == 18, incluye el '\0'
+    char buffer[] = "dd/mm/yy 00:00:00";
     timeToStr(buffer);
     print(buffer);
     putChar('\n');     // ← ¡salto de línea después de la fecha!
-    return 4;
 }
 
 void nprint(const char * buf, uint64_t lenght) {
