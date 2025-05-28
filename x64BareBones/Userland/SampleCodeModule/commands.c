@@ -20,7 +20,11 @@ int runCommand(const char *input)
         print(" - clear\n");
         print(" - echo <mensaje>\n");
         print(" - date\n");
-        incCursorY(5-1); // Move cursor down after printing help
+        print(" - div0 (causa una division por cero)\n");
+        print(" - invop (causa una operacion invalida)\n");
+        print(" - pongis golf\n");
+        print(" - registers (muestra los registros del procesador)\n");
+        incCursorY(9-1); // Move cursor down after printing help
         return 1;
     } 
 
@@ -46,8 +50,19 @@ int runCommand(const char *input)
         _div();
     }
     
-    if (strcmp(input, "inp")==0) {
+    if (strcmp(input, "invop")==0) {
         _ioe();
+    }
+
+    if (strcmp(input, "pongis golf") == 0) {
+        print("Pongis Golf is a great game!\n");
+        return 5;
+    }
+
+    if (strcmp(input, "registers") == 0) {
+        printRegisters();
+        incCursorY(19-1); // Move cursor down after printing registers
+        return 6;
     }
     
     print("Comando no reconocido\n");

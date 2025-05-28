@@ -6,6 +6,7 @@
 #define READ 0
 #define WRITE 1
 #define GET_DATE 2
+#define PRINT_REGISTERS 3
 #define SET_CURSOR 5
 #define SET_FONT_COLOR 7
 #define SET_BACKGROUND_FONT_COLOR 10
@@ -18,6 +19,11 @@ void setFontColor(uint32_t hexColor) {
 void setBackGroundColor(uint32_t hexColor) {
     sys_call(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0, 0);
 }
+
+printRegisters() {
+    sys_call(PRINT_REGISTERS, 0, 0, 0, 0);
+}
+
 //definir el struct en lib.h
 dateStruct * getDate () {
     dateStruct * date = sys_call(GET_DATE, 0, 0, 0, 0);

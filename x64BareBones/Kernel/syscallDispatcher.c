@@ -8,11 +8,12 @@ extern uint64_t * getRegisters();
 
 #define SYSNUM_READ 0
 #define SYSNUM_WRITE 1
+#define SYSNUM_GET_DATE 2
+#define SYSNUM_SHOW_REGISTERS 3
 #define SYSNUM_SET_CURSOR 5
 #define SYSNUM_DRAW_RECTANGLE 6
 #define SYSNUM_SET_FONT_COLOR 7
 #define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
-#define GET_DATE 2
 #define SYSNUM_SLEEP 32
 
 
@@ -121,11 +122,15 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint32_t hexColor = va_arg(args, uint32_t);
         drawRectangle(x, y, hexColor); //llamo directo a la fun del driver
         ret = 0;
-    }else if(rax == GET_DATE){
+    }else if(rax == SYSNUM_GET_DATE){
         ret = get_time();
     }else if (rax == SYSNUM_SLEEP) {
         int seconds = va_arg(args, int);
         sys_sleep(seconds);    
+    } else if (rax == SYSNUM_SHOW_REGISTERS) {
+        uint64_t * regs = getRegisters();
+        showRegisters(regs);
+        ret = 0;
     }
     va_end(args);
     return ret;
