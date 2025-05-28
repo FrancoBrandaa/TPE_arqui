@@ -36,6 +36,9 @@ void setFontColor(uint32_t hexColor) {
     color = hexColor;
 }
 
+void sys_setZoom(int new_zoom) {
+    zoom = new_zoom;
+}
 // void getCursor(int *x, int *y) {
 //     *x = cursorX;
 //     *y = cursorY;
@@ -78,6 +81,7 @@ uint32_t readChars(char * buf, size_t count) {
     }
     return i - end;             // si end es 1, resto un caracter (que seria el -2)
 }
+
 
 size_t sys_read(FDS fd, char *buf, size_t count) {
     if (fd == STDIN) {
