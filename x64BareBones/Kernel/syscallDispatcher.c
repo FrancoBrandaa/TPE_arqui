@@ -68,6 +68,7 @@ void sys_write(FDS fd, const char *buf, size_t count) {
     return;
 }
 
+//xd
 void sys_sleep(int seconds){
     sleep(seconds);
 }
