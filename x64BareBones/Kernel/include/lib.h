@@ -2,12 +2,7 @@
 #define LIB_H
 
 #include <stdint.h>
-
-typedef enum{
-    STDIN = 0,
-    STDOUT,
-    STDERR,
-} FDS;
+#include <videoDriver.h>
 
 char* strNCpy(const char *src, char *dest, int n);
 void * memset(void * destination, int32_t character, uint64_t length);

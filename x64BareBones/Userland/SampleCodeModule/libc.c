@@ -12,6 +12,7 @@
 #define SET_BACKGROUND_FONT_COLOR 10
 #define DRAW_RECTANGLE 6
 #define SLEEP 32
+#define GET_CURSOR 33
 
 void setFontColor(uint32_t hexColor) {
 	sys_call(SET_FONT_COLOR, hexColor, 0, 0, 0);
@@ -20,7 +21,8 @@ void setBackGroundColor(uint32_t hexColor) {
     sys_call(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0, 0);
 }
 
-printRegisters() {
+printRegisters() 
+{
     sys_call(PRINT_REGISTERS, 0, 0, 0, 0);
 }
 
@@ -28,6 +30,10 @@ printRegisters() {
 dateStruct * getDate () {
     dateStruct * date = sys_call(GET_DATE, 0, 0, 0, 0);
     return date;
+}
+
+void getCursorPos(int* x, int* y) {
+    sys_call(GET_CURSOR, (uint64_t)x, (uint64_t)y, 0, 0);
 }
 
 void timeToStr(char * buffer) { 

@@ -1,5 +1,5 @@
 #include <videoDriver.h>
-#include <stdint.h>
+
 
 static int cursorX = 0;
 static int cursorY = 0;
@@ -11,6 +11,14 @@ static int cursorY = 0;
 #define SCREEN_HEIGHT 768
 #define FG_COLOR 0xFFFFFF
 #define BG_COLOR 0x000000
+
+#define COLOR_WHITE 0xFFFFFF
+#define COLOR_BLACK 0x000000
+#define COLOR_RED 0xFF0000
+
+uint32_t color = COLOR_WHITE;
+uint32_t backgroundColor = COLOR_BLACK;
+uint8_t zoom = 1;
 
 struct vbe_mode_info_structure {
 	uint16_t attributes;		// deprecated, only bit 7 should be of interest to you, and it indicates the mode supports a linear frame buffer.
@@ -1785,6 +1793,53 @@ static uint8_t font_bitmap[256 * CHAR_HEIGHT] = {
 
     // Seguir con el resto de caracteres...
 };
+
+
+void setFontColor(uint32_t hexColor) 
+{
+    color = hexColor;
+}
+
+void setCursor(int x, int y) 
+{
+    cursorX = x;
+    cursorY = y;
+}
+
+void getCursorPos(int* x, int* y) 
+{
+    *x = cursorX;
+    *y = cursorY;
+}
+
+void setZoom(int new_zoom) 
+{
+    zoom = new_zoom;
+}
+
+void changeBackgroundColor(uint32_t hexColor)
+{
+    backgroundColor = hexColor;
+}
+
+void vd_printstr(FDS fd, const char *buf, size_t count)
+{
+        int  i= 0;
+        while (i < count) 
+        {
+            while (i < count && (cursorX+CHAR_WIDTH*zoom) < DIM_X && buf[i] != '\n') 
+            {
+                drawChar(buf[i], cursorX, cursorY, (fd==STDOUT)?color:COLOR_RED, backgroundColor, zoom);
+                cursorX += CHAR_WIDTH*zoom;
+                i++;
+            }
+            if (buf[i] == '\n' || i < count) {
+                cursorX = 0;
+                cursorY += CHAR_HEIGHT*zoom;
+            }
+            i += (buf[i] == '\n');  // si tengo un salto de linea, salteo
+        }
+}
 
 
 static void putMultPixel(uint32_t hexColor, uint64_t x, uint64_t y, int mult) {

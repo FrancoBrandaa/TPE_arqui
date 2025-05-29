@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdlib.h>
 #ifndef VIDEODRIVER_H
 #define VIDEODRIVER_H
 // Function declarations and macros for the video driver
@@ -8,6 +10,12 @@
 
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 16
+
+typedef enum{
+    STDIN = 0,
+    STDOUT,
+    STDERR,
+} FDS;
 
 typedef struct {
 	int x;
@@ -61,5 +69,13 @@ void putChar(char c);
  * @param color The color of the circle in hexadecimal format.
  */
 void drawCircle(int centerX, int centerY, int radius, uint32_t color);
+
+
+void getCursorPos(int* x, int* y);
+
+void vd_printstr(FDS fd, const char * buf, size_t count);
+void changeBackgroundColor(uint32_t hexColor);
+void setZoom(int new_zoom);
+void setFontColor(uint32_t hexColor);
 
 #endif // VIDEODRIVER_H

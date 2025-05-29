@@ -24,7 +24,6 @@ int runCommand(const char *input)
         print(" - invop (causa una operacion invalida)\n");
         print(" - pongis golf\n");
         print(" - registers (muestra los registros del procesador)\n");
-        incCursorY(9-1); // Move cursor down after printing help
         return 1;
     } 
 
@@ -61,7 +60,7 @@ int runCommand(const char *input)
 
     if (strcmp(input, "registers") == 0) {
         printRegisters();
-        incCursorY(19-1); // Move cursor down after printing registers
+        //incCursorY(19-1); // Move cursor down after printing registers
         return 6;
     }
     

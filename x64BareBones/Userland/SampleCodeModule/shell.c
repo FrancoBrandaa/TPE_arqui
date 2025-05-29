@@ -5,13 +5,7 @@
 #include <commands.h>
 
 #define COMMAND_DIM ((BASE_DIM_CHAR_X - 4) * 2) // maximo tamaño de comando, sacando margenes [EN CHARS BASE]
-#define PRINT_PROMPT()           \
-    do {                         \
-        setFontColor(white);     \
-        print("> ");             \
-        setFontColor(actualColor); \
-    } while (0)
-    
+
 static char exit = 0;
 static int command_size = 0;
 static char command[COMMAND_DIM];
@@ -22,65 +16,42 @@ static int colorIndex = 0;
 static int actualColor = green;
 static int actualBackgroundFont = black;
 
-static int cursorY = 2 * CHAR_HEIGHT;
-
-int getCursorY()
-{
-    return cursorY;
-}
-
-void incCursorY(int n) 
-{
-    cursorY += n * CHAR_HEIGHT;
-}
-
 static void displayPrompt(void)
 {
     // cleanScreen();
-    // setCursor(COMMAND_LINE_X, COMMAND_LINE_Y);
 
     setCursor(COMMAND_LINE_X, 2 * CHAR_HEIGHT); // Start at the top with a small margin
-    cursorY = 2 * CHAR_HEIGHT;            // Update the global cursor position
-
-    PRINT_PROMPT();
-}
-
-static void cleanCommandLine(void)
-{
-    // Get the current cursor position to clear just that line
-    int currentY = getCursorY(); // You may need to implement this function
-    drawRectangle((Point){COMMAND_LINE_X + 2 * CHAR_WIDTH, currentY},
-                  (Point){DIM_X, currentY + CHAR_HEIGHT},
-                  black);
+    print("> ");
 }
 
 // static void cleanCommandLine(void)
 // {
-//     drawRectangle((Point){COMMAND_LINE_X + 2 * CHAR_WIDTH, COMMAND_LINE_Y},
-//                   (Point){DIM_X, COMMAND_LINE_Y + CHAR_HEIGHT},
+//     // Get the current cursor position to clear just that line
+//     // int currentY = getCursorY(); // You may need to implement this function
+//     drawRectangle((Point){COMMAND_LINE_X + 2 * CHAR_WIDTH, currentY},
+//                   (Point){DIM_X, currentY + CHAR_HEIGHT},
 //                   black);
 // }
 
 void cleanScreen()
 {
     drawRectangle((Point){0, 0}, (Point){DIM_X, DIM_Y}, black);
-    cursorY = 2 * CHAR_HEIGHT;          // Reset the global cursor position
-    setCursor(COMMAND_LINE_X, cursorY); // Reset cursor position for the command line
+    setCursor(COMMAND_LINE_X, 2 * CHAR_HEIGHT); // Reset cursor position for the command line
+    // print("> ");
 }
 
 void shell()
 {
     cleanScreen();
-    setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, COMMAND_LINE_Y - 4 * CHAR_HEIGHT);
+    // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, COMMAND_LINE_Y - 4 * CHAR_HEIGHT);
 
     initializeShell();
 }
 
 void initializeShell()
 {
-    cursorY = 2 * CHAR_HEIGHT; // Start at the top with a small margin
-    setCursor(COMMAND_LINE_X, cursorY);
-    PRINT_PROMPT();
+    setCursor(COMMAND_LINE_X, 2 * CHAR_HEIGHT);
+    print("> ");
 
     int index = 0;
     while (!exit)
@@ -100,20 +71,23 @@ void initializeShell()
                     // Execute the command
                     int num_comando = runCommand(command);
 
-                    if (num_comando == 2)// "clear"
+                    if (num_comando == 2) // "clear"
                     {
-                        PRINT_PROMPT();
+                        int cursorY;
+                        getCursorPos(NULL, &cursorY);
+                        setCursor(COMMAND_LINE_X, cursorY);
+                        print("> ");
                         break; // If the command was "clear", we dont want to display a newline
                     }
-                    
 
-                    // Move to the next line for the new prompt
-                    cursorY += 2 * CHAR_HEIGHT; // Give some space between commands
+                    // if (cursorY >= DIM_Y - 3 * CHAR_HEIGHT)
+                    //     cleanScreen();
 
-                    if (cursorY >= DIM_Y - 3 * CHAR_HEIGHT)
-                        cleanScreen();
+                    int cursorY;
+                    getCursorPos(NULL, &cursorY);
+                    setCursor(COMMAND_LINE_X, cursorY);
+                    print("> ");
 
-                    PRINT_PROMPT();
                     break;
                 }
                 else if (c == '\b')
@@ -124,8 +98,10 @@ void initializeShell()
                         command[index] = ' ';
                         // Limpia el área del último carácter borrado
                         int charX = COMMAND_LINE_X + 2 * CHAR_WIDTH + index * CHAR_WIDTH;
-                        int charY = cursorY;
-                        drawRectangle((Point){charX, charY}, (Point){charX + CHAR_WIDTH, charY + CHAR_HEIGHT}, black);
+                        int cursorY;
+                        getCursorPos(NULL, &cursorY);
+                        drawRectangle((Point){charX, cursorY}, (Point){charX + CHAR_WIDTH, cursorY + CHAR_HEIGHT}, black);
+                        // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
                         setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
                         nprint(command, index);
                     }
@@ -133,11 +109,17 @@ void initializeShell()
                 else if (index < COMMAND_DIM - 1)
                 {
                     command[index++] = c;
+                    int cursorY;
+                    getCursorPos(NULL, &cursorY);
+                    // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
                     setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
                     nprint(command, index);
                 }
                 else
                 {
+                    int cursorY;
+                    getCursorPos(NULL, &cursorY);
+                    // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
                     setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
                     print("Comando demasiado largo\n");
                     cursorY += CHAR_HEIGHT;
@@ -147,10 +129,6 @@ void initializeShell()
         }
     }
 }
-
-
-
-
 
 // void initializeShell() {
 //     displayPrompt();

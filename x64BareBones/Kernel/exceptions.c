@@ -1,5 +1,6 @@
 #include <syscallDispatcher.h>
 #include <videoDriver.h>
+#include <time.h>
 #include <lib.h>
 #define ZERO_EXCEPTION_ID 0
 #define INVALID_OPCODE 6
@@ -36,9 +37,9 @@ static void invalid_opcode() {
 void printError(char * msg){
   drawRectangle(&((Point){0,0}), &((Point){DIM_X, DIM_Y}), 0x000000);
   sys_write(STDERR, msg, strLen(msg));
-  sys_sleep(5);
+  sleep(5);
   showRegisters();
-  sys_sleep(5);
+  sleep(5);
   sys_write(STDERR, "\n\tPress enter to return to the shell\n", 36);
   
 }

@@ -1,8 +1,4 @@
 #include <syscallDispatcher.h>
-#include <stdarg.h>
-#include <time.h>
-#include <videoDriver.h>
-#include <keyboardDriver.h>
 
 extern uint64_t * getRegisters();
 
@@ -15,62 +11,22 @@ extern uint64_t * getRegisters();
 #define SYSNUM_SET_FONT_COLOR 7
 #define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
 #define SYSNUM_SLEEP 32
+#define SYSNUM_GET_CURSOR 33
 
 
-#define COLOR_WHITE 0xFFFFFF
-#define COLOR_BLACK 0x000000
-#define COLOR_RED 0xFF0000
 
-uint32_t color = COLOR_WHITE;
-uint32_t backgroundColor = COLOR_BLACK;
-int cursorX=0, cursorY=0;
-uint8_t zoom = 1;
-
-// Se setea el cursor [EN PIXELES]
-size_t sys_setCursor(int x, int y) {
-    cursorX = x;
-    cursorY = y;
-    return 1;
+void sys_setZoom(int new_zoom) 
+{
+    if (new_zoom < 1)
+        new_zoom = 1; // Asegurarse de que el zoom no sea menor a 1
+    setZoom(new_zoom);
 }
 
-void setFontColor(uint32_t hexColor) {
-    color = hexColor;
-}
-
-void sys_setZoom(int new_zoom) {
-    zoom = new_zoom;
-}
-// void getCursor(int *x, int *y) {
-//     *x = cursorX;
-//     *y = cursorY;
-// }
-
-void changeBackgroundColor(uint32_t hexColor) {  
-    backgroundColor = hexColor;
-}
-
-void sys_write(FDS fd, const char *buf, size_t count) {
-    if(fd == STDOUT || fd == STDERR) {
-        int i = 0;
-        while (i < count) {
-            while (i < count && (cursorX+CHAR_WIDTH*zoom) < DIM_X && buf[i] != '\n') {    
-                drawChar(buf[i], cursorX, cursorY, (fd==STDOUT)?color:COLOR_RED, backgroundColor, zoom);
-                cursorX += CHAR_WIDTH*zoom;
-                i++;
-            }
-            if (buf[i] == '\n' || i < count) {
-                cursorX = 0;
-                cursorY += CHAR_HEIGHT*zoom;
-            }
-            i += (buf[i] == '\n');  // si tengo un salto de linea, salteo
-        }
-    }
+void sys_write(FDS fd, const char *buf, size_t count) 
+{
+    if(fd == STDOUT || fd == STDERR) 
+        vd_printstr(fd, buf, count);
     return;
-}
-
-//xd
-void sys_sleep(int seconds){
-    sleep(seconds);
 }
 
 uint32_t readChars(char * buf, size_t count) {
@@ -83,7 +39,6 @@ uint32_t readChars(char * buf, size_t count) {
     }
     return i - end;             // si end es 1, resto un caracter (que seria el -2)
 }
-
 
 size_t sys_read(FDS fd, char *buf, size_t count) {
     if (fd == STDIN) {
@@ -110,7 +65,7 @@ void syscallDispatcher(uint64_t rax, ...) {
     } else if (rax == SYSNUM_SET_CURSOR) {
         int x = (int)va_arg(args, uint64_t);
         int y = (int)va_arg(args, uint64_t);
-        sys_setCursor(x, y);
+        setCursor(x, y);
     } else if (rax == SYSNUM_SET_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
         setFontColor(hexColor);
@@ -127,10 +82,16 @@ void syscallDispatcher(uint64_t rax, ...) {
         ret = get_time();
     }else if (rax == SYSNUM_SLEEP) {
         int seconds = va_arg(args, int);
-        sys_sleep(seconds);    
+        sleep(seconds);  
     } else if (rax == SYSNUM_SHOW_REGISTERS) {
         uint64_t * regs = getRegisters();
         showRegisters(regs);
+        ret = 0;
+    }else if (rax == SYSNUM_GET_CURSOR) 
+    {
+        int* x = va_arg(args, int*);
+        int* y = va_arg(args, int*);
+        getCursorPos(x, y);
         ret = 0;
     }
     va_end(args);
