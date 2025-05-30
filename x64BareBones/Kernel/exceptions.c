@@ -35,6 +35,7 @@ static void invalid_opcode() {
 }
 
 void printError(char * msg){
+vd_setCursor(0,0);
   drawRectangle(&((Point){0,0}), &((Point){DIM_X, DIM_Y}), 0x000000);
   sys_write(STDERR, msg, strLen(msg));
   sleep(5);

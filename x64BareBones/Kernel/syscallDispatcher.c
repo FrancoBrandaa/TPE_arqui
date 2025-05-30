@@ -10,17 +10,12 @@ extern uint64_t * getRegisters();
 #define SYSNUM_DRAW_RECTANGLE 6
 #define SYSNUM_SET_FONT_COLOR 7
 #define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
+#define SYSNUM_SET_ZOOM 13
 #define SYSNUM_SLEEP 32
 #define SYSNUM_GET_CURSOR 33
+#define SYSNUM_CLEAN_SCREEN 30
+#define SYSNUM_PUT_PIXEL 19
 
-
-
-void sys_setZoom(int new_zoom) 
-{
-    if (new_zoom < 1)
-        new_zoom = 1; // Asegurarse de que el zoom no sea menor a 1
-    setZoom(new_zoom);
-}
 
 void sys_write(FDS fd, const char *buf, size_t count) 
 {
@@ -65,7 +60,7 @@ void syscallDispatcher(uint64_t rax, ...) {
     } else if (rax == SYSNUM_SET_CURSOR) {
         int x = (int)va_arg(args, uint64_t);
         int y = (int)va_arg(args, uint64_t);
-        setCursor(x, y);
+        vd_setCursor(x, y);
     } else if (rax == SYSNUM_SET_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
         setFontColor(hexColor);
@@ -83,7 +78,8 @@ void syscallDispatcher(uint64_t rax, ...) {
     }else if (rax == SYSNUM_SLEEP) {
         int seconds = va_arg(args, int);
         sleep(seconds);  
-    } else if (rax == SYSNUM_SHOW_REGISTERS) {
+    } else if (rax == SYSNUM_SHOW_REGISTERS) 
+    {
         uint64_t * regs = getRegisters();
         showRegisters(regs);
         ret = 0;
@@ -93,6 +89,20 @@ void syscallDispatcher(uint64_t rax, ...) {
         int* y = va_arg(args, int*);
         getCursorPos(x, y);
         ret = 0;
+    }else if (rax == SYSNUM_SET_ZOOM) 
+    {
+        int new_zoom = va_arg(args, int);
+        vd_setZoom(new_zoom);
+        ret = 0;
+    }else if (rax == SYSNUM_CLEAN_SCREEN) 
+    {
+        vd_cleanScreen();
+        ret = 0;
+    }else if(rax == SYSNUM_PUT_PIXEL){
+        uint32_t hexColor = va_arg(args, uint32_t);
+        uint64_t x = va_arg(args, uint64_t);
+        uint64_t y = va_arg(args, uint64_t);
+        putPixel(hexColor,  x,  y);
     }
     va_end(args);
     return ret;

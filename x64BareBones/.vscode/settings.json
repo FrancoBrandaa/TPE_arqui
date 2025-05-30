@@ -3,6 +3,7 @@
         "date.h": "c",
         "random": "c",
         "limits": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "libc.h": "c"
     }
 }

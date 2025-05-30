@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <lib.h>
 #ifndef VIDEODRIVER_H
 #define VIDEODRIVER_H
 // Function declarations and macros for the video driver
@@ -21,13 +22,7 @@ typedef struct {
 	int x;
 	int y;
 }Point;
-/**
- * @brief Draws a pixel on the screen at the specified coordinates with the given color.
- *
- * @param hexColor The color of the pixel in hexadecimal format.
- * @param x The x-coordinate of the pixel.
- * @param y The y-coordinate of the pixel.
- */
+
 /**
  * @brief Puts a pixel on the screen at the specified coordinates with the given color.
  * 
@@ -58,7 +53,8 @@ void drawRectangle(Point* topLeft, Point* downRigth, uint32_t c);
  */
 void drawChar(unsigned char c, int x, int y, int fgcolor, int bgcolor, int mult);
 
-void putChar(char c);
+
+void vd_putChar(char c, FDS fd);
 
 /**
  * @brief Draws a circle on the screen.
@@ -70,12 +66,14 @@ void putChar(char c);
  */
 void drawCircle(int centerX, int centerY, int radius, uint32_t color);
 
-
+void vd_setCursor(int x, int y);
 void getCursorPos(int* x, int* y);
-
+void vd_cleanScreen(void);
 void vd_printstr(FDS fd, const char * buf, size_t count);
 void changeBackgroundColor(uint32_t hexColor);
-void setZoom(int new_zoom);
+void vd_setZoom(int new_zoom);
 void setFontColor(uint32_t hexColor);
+void scroll_screen(void);
+
 
 #endif // VIDEODRIVER_H

@@ -14,6 +14,9 @@
 //#define NULL (void*)0
 
 #define zoom_user 1
+#define ZOOM_MAX 5
+#define ZOOM_MIN 1
+
 
 
 #define CHAR_WIDTH (BASE_CHAR_WIDTH*zoom_user)       // Ancho de un char actual [EN PIXELES]
@@ -60,7 +63,9 @@ typedef struct dateStruct {
 } dateStruct;
 
 
-void SLEEP(uint64_t seconds);
+void putPixel(uint32_t color,uint64_t x, uint64_t y);
+
+void sleep(uint64_t seconds);
 
 dateStruct * getDate ();
 /**
@@ -180,11 +185,18 @@ void setCursor(uint32_t x, uint32_t y);
  */
 void setCharCursor(uint32_t x, uint32_t y);
 
+/**
+ * @brief Converts a string to an integer.
+ * 
+ * @param str The string to convert.
+ * @return int The converted integer value.
+ */
+int atoi(const char *str);
 
 
 int strcmp(const char* s1, const char* s2);
 
-
+void setZoom(int new_zoom);
 
 int strncmp(const char* s1, const char* s2, size_t n);
 

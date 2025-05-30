@@ -5,168 +5,115 @@
 #include <commands.h>
 
 #define COMMAND_DIM ((BASE_DIM_CHAR_X - 4) * 2) // maximo tamaño de comando, sacando margenes [EN CHARS BASE]
+//#define COMMAND_DIM 256 // maximo tamaño de comando, sacando margenes [EN BYTES]
+
 
 static char exit = 0;
-static int command_size = 0;
 static char command[COMMAND_DIM];
 static void initializeShell();
 
-static uint32_t color[] = {blue, green, red, yellow, purple, cyan, orange, pink, brown, lightGrey, lightBlue, lightGreen, lightRed, lightPink, lightBrown, darkBlue, darkGreen, darkRed, darkYellow, darkPurple, white};
-static int colorIndex = 0;
-static int actualColor = green;
-static int actualBackgroundFont = black;
+static uint32_t color[] = {blue, green, red, yellow, purple, cyan, orange, pink, brown, 
+    lightGrey, lightBlue, lightGreen, lightRed, lightPink, lightBrown, darkBlue, darkGreen, 
+    darkRed, darkYellow, darkPurple, white};
 
-static void displayPrompt(void)
-{
-    // cleanScreen();
-
-    setCursor(COMMAND_LINE_X, 2 * CHAR_HEIGHT); // Start at the top with a small margin
-    print("> ");
-}
-
-// static void cleanCommandLine(void)
+// void cmd_exit()
 // {
-//     // Get the current cursor position to clear just that line
-//     // int currentY = getCursorY(); // You may need to implement this function
-//     drawRectangle((Point){COMMAND_LINE_X + 2 * CHAR_WIDTH, currentY},
-//                   (Point){DIM_X, currentY + CHAR_HEIGHT},
-//                   black);
+//     exit = 1;
+//     print("Exiting shell...\n");
 // }
-
-void cleanScreen()
-{
-    drawRectangle((Point){0, 0}, (Point){DIM_X, DIM_Y}, black);
-    setCursor(COMMAND_LINE_X, 2 * CHAR_HEIGHT); // Reset cursor position for the command line
-    // print("> ");
-}
-
+    
 void shell()
 {
     cleanScreen();
-    // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, COMMAND_LINE_Y - 4 * CHAR_HEIGHT);
-
+    //setCursor(0, 0); // Reset cursor position to the top-left corner
+    print("Los monos-1 TPE!\n");
     initializeShell();
 }
 
+
 void initializeShell()
 {
-    setCursor(COMMAND_LINE_X, 2 * CHAR_HEIGHT);
-    print("> ");
-
     int index = 0;
     while (!exit)
     {
+        print("  > ");
         index = 0;
         while (1)
         {
             char c = getChar();
-
             if (c != NOT_KEY)
-            {
-                if (c == '\n')
+            { 
+                if (c == '\n' || c == '\r')
                 { // Enter
                     command[index] = '\0';
                     print("\n");
 
                     // Execute the command
                     int num_comando = runCommand(command);
-
-                    if (num_comando == 2) // "clear"
-                    {
-                        int cursorY;
-                        getCursorPos(NULL, &cursorY);
-                        setCursor(COMMAND_LINE_X, cursorY);
-                        print("> ");
-                        break; // If the command was "clear", we dont want to display a newline
-                    }
-
-                    // if (cursorY >= DIM_Y - 3 * CHAR_HEIGHT)
-                    //     cleanScreen();
-
-                    int cursorY;
-                    getCursorPos(NULL, &cursorY);
-                    setCursor(COMMAND_LINE_X, cursorY);
-                    print("> ");
-
                     break;
                 }
-                else if (c == '\b')
+                else if (c == '\b' && index > 0) //se pasa del borrado 
                 { // Backspace
-                    if (index > 0)
-                    {
+                        // Elimina el último carácter del comando
+                        putChar('\b'); // Mueve el cursor hacia atrás
                         index--;
-                        command[index] = ' ';
-                        // Limpia el área del último carácter borrado
-                        int charX = COMMAND_LINE_X + 2 * CHAR_WIDTH + index * CHAR_WIDTH;
-                        int cursorY;
-                        getCursorPos(NULL, &cursorY);
-                        drawRectangle((Point){charX, cursorY}, (Point){charX + CHAR_WIDTH, cursorY + CHAR_HEIGHT}, black);
-                        // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
-                        setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
-                        nprint(command, index);
-                    }
                 }
-                else if (index < COMMAND_DIM - 1)
+                else if (c != '\b' )// Comando no entra en la pantalla
                 {
-                    command[index++] = c;
-                    int cursorY;
-                    getCursorPos(NULL, &cursorY);
-                    // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
-                    setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
-                    nprint(command, index);
+                    if(index < COMMAND_DIM - 1){
+                        command[index++] = c;
+                        putChar(c); // Muestra el carácter en la pantalla
+                    }else{
+                        print("Comando demasiado largo\n");
+                        index = 0; // Reinicia el índice del comando
+                        break;
+                    }  
                 }
-                else
-                {
-                    int cursorY;
-                    getCursorPos(NULL, &cursorY);
-                    // setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
-                    setCursor(COMMAND_LINE_X + 2 * CHAR_WIDTH, cursorY);
-                    print("Comando demasiado largo\n");
-                    cursorY += CHAR_HEIGHT;
-                    break;
-                }
+                
             }
         }
     }
 }
 
-// void initializeShell() {
-//     displayPrompt();
-//     int index = 0;
-//     while (!exit) {
-//         index = 0;
-//         while (1) {
-//             // _hlt(); //llamo a hlt la cual no permite que continue la ejecucion hasta que llega una interrupcion
-//             char c = getChar();  // asumimos que esta syscall ya está conectad
+// while (true)
+//         {
+//             char c = getChar();
+//             if (c == NOT_KEY)
+//                 continue;
 
-//             if(c != NOT_KEY){
-//             if (index == 0) {
-//                 displayPrompt();
-//             }
-//             if (c == '\n') {  // Enter
+//             if (c == '\n' || c == '\r')
+//             {
+//                 // Fin de línea: cierra cadena y ejecuta comando
 //                 command[index] = '\0';
 //                 print("\n");
-//                 // Ejecutar el comando
-//                 runCommand(command);
+//                 int result = runCommand(command);
+//                 (void)result;  // evitar warning si no se usa
 //                 break;
-//             } else if (c == '\b') {  // Backspace
-//                 if (index > 0) {
-//                     index--;
-//                     command[index] = ' ';
-//                     cleanCommandLine();
-//                     setCursor(COMMAND_LINE_X+2*CHAR_WIDTH, COMMAND_LINE_Y);
-//                     nprint(command, index);
-//                 }
-//             } else if (index < COMMAND_DIM - 1) {
-//                 command[index++] = c;
-//                 setCursor(COMMAND_LINE_X+2*CHAR_WIDTH, COMMAND_LINE_Y);
-//                 nprint(command, index);
-//             }else{
-//                 setCursor(COMMAND_LINE_X+2*CHAR_WIDTH, COMMAND_LINE_Y);
-//                 print("Comando demasiado largo\n");
-//                 break;
-//             } //que hago si se pasa de la dim??
 //             }
-//         }
-//     }
-// }
+//             else if (c == '\b')
+//             {
+//                 // Backspace: borra del buffer y de la pantalla
+//                 if (index > 0)
+//                 {
+                        //ESTO LO HACE PABLITOOO
+//                     index--;
+//                     putChar('\b');
+//                     putChar(' ');
+//                     putChar('\b');
+//                 }
+//             }
+//             else if (index < COMMAND_DIM - 1)
+//             {
+//                 // Carácter válido: almacena y muestra
+//                 command[index++] = c;
+//                 putChar(c);
+//             }
+//             else
+//             {
+//                 // Demasiado largo: informa, reinicia buffer
+//                 print("\nComando demasiado largo\n");
+//                 index = 0;
+//                 break;
+//             }
+
+
