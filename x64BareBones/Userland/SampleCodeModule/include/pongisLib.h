@@ -2,6 +2,18 @@
 #define PORO_SPRITE_H
 
 #include <stdint.h>
+#include<libc.h>
+
+typedef struct{
+    float x, y;       // posición actual
+    float dx, dy;     // dirección y velocidad (paso por frame)
+    int radius;
+    int color;
+}Ball;
+
+
+
+
 
 // Top-down Poro sprite, resized from (1024, 1024) to 32×32 pixels
 // Transparent pixels use the magic color 0xFF00FF

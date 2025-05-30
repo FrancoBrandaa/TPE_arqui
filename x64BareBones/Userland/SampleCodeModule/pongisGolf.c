@@ -1,42 +1,53 @@
-#include <poroSprite.h>
-#include <libc.h>
-#include <poroSprite.h>    
 
-#include <poroSprite.h>
-#include <libc.h>
+//#include <libc.h>
+#include <pongisLib.h>
 
-#include <poroSprite.h>
-#include <libc.h>
 
 void startPongis()
 {
     cleanScreen();
+    Ball ball = { 
+    .x = 100, 
+    .y = 100, 
+    .dx = 2.0,     // velocidad en x
+    .dy = 1.5,     // velocidad en y
+    .radius = 200, 
+    .color = 0xFFFFFF // blanco, por ejemplo
+    };
+    // cleanScreen();
 
-    int scale = 10; // Cambia este valor para agrandar/reducir el sprite
-    int sprite_size = 32;
-    int offset_x = 100;
-    int offset_y = 100;
+    // int scale = 10; // Cambia este valor para agrandar/reducir el sprite
+    // int sprite_size = 32;
+    // int offset_x = 100;
+    // int offset_y = 100;
 
-    for (int y = 0; y < sprite_size; y++)
-    {
-        for (int x = 0; x < sprite_size; x++)
-        {
-            uint32_t color = poro_sprite_32[y * sprite_size + x];
-            if (color != 0xFF00FF) {
-                // Dibuja un bloque de scale x scale píxeles
-                for (int dy = 0; dy < scale; dy++)
-                {
-                    for (int dx = 0; dx < scale; dx++)
-                    {
-                        putPixel(color, offset_x + x * scale + dx, offset_y + y * scale + dy);
-                    }
-                }
-            }
-        }
+    // for (int y = 0; y < sprite_size; y++)
+    // {
+    //     for (int x = 0; x < sprite_size; x++)
+    //     {
+    //         uint32_t color = poro_sprite_32[y * sprite_size + x];
+    //         if (color != 0xFF00FF) {
+    //             // Dibuja un bloque de scale x scale píxeles
+    //             for (int dy = 0; dy < scale; dy++)
+    //             {
+    //                 for (int dx = 0; dx < scale; dx++)
+    //                 {
+    //                     putPixel(color, offset_x + x * scale + dx, offset_y + y * scale + dy);
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+
+    // sleep(5);
+    // cleanScreen();
+    while (1) {
+    clearBall(&ball);
+    updateBall(&ball, DIM_X, DIM_Y);
+    drawBall(&ball);
+    sleep(1); // 1 segundo entre frames
     }
 
-    sleep(5);
-    cleanScreen();
 }
 
 
