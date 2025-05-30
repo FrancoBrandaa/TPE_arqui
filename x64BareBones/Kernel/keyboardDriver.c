@@ -60,14 +60,7 @@ void keyboard_handler() {
     }
 }
 
-// NO SE PARA QUE ESTABA ESTA FUNCION POR ESO POR LAS DUDAS COMENTO
-// char getChar() {
-//     // Busy-wait until a key is available
-//     while (bufferHead == bufferTail);
-//     char c = keyBuffer[bufferTail];
-//     bufferTail = (bufferTail + 1) % BUFFER_SIZE;
-//     return c;
-// }
+
 
 char hasNextKey() {
     // Non-blocking check for pending keys

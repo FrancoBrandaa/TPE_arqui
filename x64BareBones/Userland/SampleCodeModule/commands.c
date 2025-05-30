@@ -56,7 +56,8 @@ int runCommand(const char *input)
         _ioe();
     }
 
-    if (strcmp(input, "pongis golf") == 0)
+    // if (strcmp(input, "pongis golf") == 0)
+    if (strcmp(input, "pg") == 0)
     {
         startPongis();
         return 5;
@@ -77,6 +78,7 @@ int runCommand(const char *input)
                 return 7;
             }
             setZoom(new_zoom);
+            cleanScreen();
             print("Zoom set to ");
             print(input + 5);
             print("\n");

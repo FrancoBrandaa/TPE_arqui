@@ -1811,7 +1811,7 @@ void getCursorPos(int *x, int *y)
 void vd_setZoom(int new_zoom)
 {
     zoom = new_zoom;
-    vd_cleanScreen();
+    //vd_cleanScreen();
 }
 
 void changeBackgroundColor(uint32_t hexColor)

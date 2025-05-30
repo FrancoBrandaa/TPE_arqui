@@ -26,6 +26,7 @@ void shell()
 {
     cleanScreen();
     //setCursor(0, 0); // Reset cursor position to the top-left corner
+    setZoom(2);
     print("Los monos-1 TPE!\n");
     initializeShell();
 }

@@ -1,5 +1,6 @@
 #include <time.h>
 #include <naiveConsole.h>
+#include <stdint.h>
 
 static unsigned long ticks = 0;
 
@@ -30,11 +31,14 @@ dateStruct * get_time () {
     return &date;
 }
 
-//in seconds
-void sleep(int ticksToWait) {
-    unsigned long start = ticks  ; 
-    while (ticks - start < ticksToWait*18){ // Convert ticks to seconds,  ticksToWait*18
-        _hlt();
-    };
-}
 
+
+// Sleep for at least the given number of microseconds
+void sleep(int microseconds) {
+    unsigned long start = ticks;
+    uint64_t ticks_to_wait = ((uint64_t)microseconds * 18 + 999999) / 1000000;
+    if (ticks_to_wait == 0) ticks_to_wait = 1;
+    while (ticks - start < ticks_to_wait) {
+        _hlt();
+    }
+}
