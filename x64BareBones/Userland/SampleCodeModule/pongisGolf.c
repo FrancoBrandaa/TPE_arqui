@@ -3,11 +3,11 @@
 #define ANGLES 360
 
 
-
-void setSpeed(Ball * ball , float vx, float vy){
-        ball->dx = vx;
-        ball->dy = vy;
-}
+//NO SE USA, NO LA BORRO POR PAJA
+// void setSpeed(Object * ball , float vx, float vy){
+//         ball->dx = vx;
+//         ball->dy = vy;
+// }
 
 void startPongis()
 {
@@ -69,50 +69,52 @@ void startPongis()
 void startGame()
 {
     cleanScreen();
-    int angle = 90;       // en grados
+    int angle = 0;       // en grados
     float speed = 3.0f;   // píxeles por frame
 
-    Ball ball = {
+    Object ball = {
         .x      = 100.0f,
         .y      = 100.0f,
         .dx     = 0.0f,
         .dy     = 0.0f,
-        .radius = 20,
-        .color  = 0xFFFFFF
+        .speed  = 0.0f,
+        .angle  = .0f,
+        .radius = 20.0f,
+        .color  =  0x00FF00 //COLOR_GREEN
     };
-    Ball player = {
+    Object player = {
         .x      = 400.0f,
         .y      = 100.0f,
         .dx     = 0.0f,
         .dy     = 0.0f,
-        .radius = 20,
+        .speed  = 0.0f,
+        .angle  = 0.0f,
+        .radius = 20.0f,
         .color  = 0xFFFFFF
     };
-
-    // 1) convertir fixed-point → real en [-1,1]
-    float fx = (float)get_cos(angle) / (1 << FIXED_SHIFT);
-    float fy = (float)get_sin(angle) / (1 << FIXED_SHIFT);
-    float vy;
-    float vx;
-    // 2) aplicar velocidad real
-    vx = fx * speed;
-    vy = fy * speed;
-    setSpeed(&ball, vx, vy);
     while (1) {
         cleanScreen();
+        applyControls(&player, getChar());
+        updateObject(&player, 1024, 768);
+        updateObject(&ball, 1024, 768);
         if (checkCollision(&player, &ball)) {
-        ball.dx = player.dx;
-        ball.dy = player.dy;
-        player.dx = 0;
-        player.dy = 0;
+            ball.dx = player.dx;
+            ball.dy = player.dy;
+            player.dx -= 1 ;
+            player.dy -= 1 ;
         }
-        updateBall(&ball, DIM_X, DIM_Y);
-        updateBall(&player, DIM_X, DIM_Y);
-        drawBall(&ball);
+       //applyFriction(&player, 0.5f);
+       //si le aplico friccion a la pelota rompe (frena muy rapido??)
+        //applyFriction(&ball, 0.05f);
         drawBall(&player);
-        sleep(20);   // 20 ms → ~50 fps
+        drawBall(&ball);
+        sleep(10);   // 20 ms → ~50 fps
     }
+
+    
+    
 }
+
 
 
 

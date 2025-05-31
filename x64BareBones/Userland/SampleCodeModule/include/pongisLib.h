@@ -9,6 +9,36 @@
 #define QUAD_SIZE   91   // 0°–90° inclusive
 #define PI 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647
 
+//noc si va esto aca despues hay que ordenar todo
+typedef enum {
+    COLOR_BLACK       = 0x000000,
+    COLOR_WHITE       = 0xFFFFFF,
+    COLOR_RED         = 0xFF0000,
+    COLOR_GREEN       = 0x00FF00,
+    COLOR_BLUE        = 0x0000FF,
+    COLOR_YELLOW      = 0xFFFF00,
+    COLOR_CYAN        = 0x00FFFF,
+    COLOR_MAGENTA     = 0xFF00FF,
+    COLOR_ORANGE      = 0xFFA500,
+    COLOR_PINK        = 0xFFC0CB,
+    COLOR_BROWN       = 0xA52A2A,
+    COLOR_LIGHTGREY   = 0xD3D3D3,
+    COLOR_LIGHTBLUE   = 0xADD8E6,
+    COLOR_LIGHTGREEN  = 0x90EE90,
+    COLOR_LIGHTRED    = 0xFFA07A,
+    COLOR_LIGHTPINK   = 0xFFB6C1,
+    COLOR_LIGHTBROWN  = 0xD2B48C,
+    COLOR_DARKBLUE    = 0x00008B,
+    COLOR_DARKGREEN   = 0x006400,
+    COLOR_DARKRED     = 0x8B0000,
+    COLOR_DARKYELLOW  = 0x9B870C,
+    COLOR_DARKMAGENTA = 0x800080,
+    COLOR_DARKCYAN    = 0x008B8B,
+    COLOR_DARKORANGE  = 0xFF8C00,
+    COLOR_DARKPINK    = 0xFF1493,
+    COLOR_DARKBROWN   = 0x654321
+} Color;
+
 static const int16_t sin_table_q[QUAD_SIZE] = {
     0,    572,   1144,   1715,   2286,   2856,   3425,   3993,   4560,   5126,
     5690,   6252,   6813,   7371,   7927,   8481,   9032,   9580,  10126,  10668,
@@ -24,13 +54,16 @@ static const int16_t sin_table_q[QUAD_SIZE] = {
 
 typedef struct{
     float x, y;       // posición actual
-    float dx, dy;     // dirección y velocidad (paso por frame)
-    int radius;
+    float dx, dy; 
+    float speed;      // módulo de la velocidad
+    float angle;     // dirección y velocidad (paso por frame)
+    float radius;
     int color;
-}Ball;
-
+}Object;
+void applyFriction(Object* b, float deceleration);
 int get_sin(int angle);
 int get_cos(int angle);
+void applyControls(Object* b, char keyPressed);
 
 // Top-down Poro sprite, resized from (1024, 1024) to 32×32 pixels
 // Transparent pixels use the magic color 0xFF00FF
