@@ -12,10 +12,6 @@ static char exit = 0;
 static char command[COMMAND_DIM];
 static void initializeShell();
 
-static uint32_t color[] = {blue, green, red, yellow, purple, cyan, orange, pink, brown, 
-    lightGrey, lightBlue, lightGreen, lightRed, lightPink, lightBrown, darkBlue, darkGreen, 
-    darkRed, darkYellow, darkPurple, white};
-
 // void cmd_exit()
 // {
 //     exit = 1;
@@ -25,9 +21,10 @@ static uint32_t color[] = {blue, green, red, yellow, purple, cyan, orange, pink,
 void shell()
 {
     cleanScreen();
+    setFontColor(white);
     //setCursor(0, 0); // Reset cursor position to the top-left corner
     setZoom(2);
-    print("Los monos-1 TPE!\n");
+    print("Los Monos TPE!\n");
     initializeShell();
 }
 

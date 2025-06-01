@@ -1789,9 +1789,36 @@ static uint8_t font_bitmap[256 * CHAR_HEIGHT] = {
     // Seguir con el resto de caracteres...
 };
 
-void setFontColor(uint32_t hexColor)
+// void vd_setFontColor(uint32_t hexColor)
+// {
+//     color = hexColor;
+// }
+
+void vd_setFontColor(uint32_t hexColor)
 {
+    uint32_t oldColor = color;
     color = hexColor;
+    replaceColor(oldColor, hexColor);
+}
+
+void replaceColor(uint32_t oldColor, uint32_t newColor) {
+    uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
+    uint64_t width = VBE_mode_info->width;
+    uint64_t height = VBE_mode_info->height;
+    uint32_t pitch = VBE_mode_info->pitch;
+    uint8_t bpp = VBE_mode_info->bpp / 8;
+
+    for (uint64_t y = 0; y < height; y++) {
+        for (uint64_t x = 0; x < width; x++) {
+            uint64_t offset = x * bpp + y * pitch;
+            uint32_t pixel = framebuffer[offset] | (framebuffer[offset+1] << 8) | (framebuffer[offset+2] << 16);
+            if (pixel == oldColor) {
+                framebuffer[offset]     = (newColor) & 0xFF;
+                framebuffer[offset + 1] = (newColor >> 8) & 0xFF;
+                framebuffer[offset + 2] = (newColor >> 16) & 0xFF;
+            }
+        }
+    }
 }
 
 void vd_setCursor(int x, int y)
@@ -1811,10 +1838,9 @@ void getCursorPos(int *x, int *y)
 void vd_setZoom(int new_zoom)
 {
     zoom = new_zoom;
-    //vd_cleanScreen();
 }
 
-void changeBackgroundColor(uint32_t hexColor)
+void vd_SetBackgroundColor(uint32_t hexColor)
 {
     backgroundColor = hexColor;
 }
@@ -1861,7 +1887,7 @@ static void putMultPixel(uint32_t hexColor, uint64_t x, uint64_t y, int mult)
 
 void vd_putChar(char c, FDS fd)
 {
-    color = (fd == STDOUT) ? COLOR_WHITE : COLOR_RED;
+    //color = (fd == STDOUT) ? COLOR_WHITE : COLOR_RED;
 
     if (c == '\n')
     { // new line
@@ -1929,7 +1955,6 @@ void drawRectangle(Point *topLeft, Point *downRigth, uint32_t c)
 }
 
 /*
-
 void vd_draw_circle(int cx, int cy, int radius, uint32_t color) {//Nota: posibles errores si los tipos no coinciden
     for(int dy = -radius; dy <= radius; dy++) {
         for(int dx = -radius; dx <= radius; dx++) {
@@ -1939,7 +1964,6 @@ void vd_draw_circle(int cx, int cy, int radius, uint32_t color) {//Nota: posible
         }
     }
 }
-
 */
 
 void drawCircle(int centerX, int centerY, int radius, uint32_t color)

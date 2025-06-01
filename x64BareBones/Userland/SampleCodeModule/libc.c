@@ -15,6 +15,10 @@
 #define GET_CURSOR 33
 #define PUT_PIXEL 19
 
+//  uint32_t color[] = {blue, green, red, yellow, purple, cyan, orange, pink, brown, 
+//     lightGrey, lightBlue, lightGreen, lightRed, lightPink, lightBrown, darkBlue, darkGreen, 
+//     darkRed, darkYellow, darkPurple, white};
+
 void setFontColor(uint32_t hexColor)
 {
     sys_call(SET_FONT_COLOR, hexColor, 0, 0, 0);

@@ -63,10 +63,10 @@ void syscallDispatcher(uint64_t rax, ...) {
         vd_setCursor(x, y);
     } else if (rax == SYSNUM_SET_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
-        setFontColor(hexColor);
+        vd_setFontColor(hexColor);
     }  else if (rax == SYSNUM_SET_BACKGROUND_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
-        changeBackgroundColor(hexColor);
+        vd_SetBackgroundColor(hexColor);
     }else if(rax == SYSNUM_DRAW_RECTANGLE){
         Point* x = va_arg(args, Point*);
         Point* y = va_arg(args, Point*);
@@ -103,6 +103,7 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint64_t x = va_arg(args, uint64_t);
         uint64_t y = va_arg(args, uint64_t);
         putPixel(hexColor,  x,  y);
+        ret = 0;
     }
     va_end(args);
     return ret;
