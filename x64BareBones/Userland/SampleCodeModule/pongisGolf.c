@@ -10,18 +10,17 @@
 
 void startPongis()
 {
-    cleanScreen();
-    // franc se la come
-    setZoom(4);
-    setFontColor(blue);
-    print("           Poro Golf\n\n");
-    setZoom(3);
-    print("    Presione Enter para empezar a jugar\n\n");
-    print("          Presione Q para salir\n");
-    printPoroMenu();
-
     while (1)
     {
+        cleanScreen();
+        // franc se la come
+        setZoom(4);
+        setFontColor(blue);
+        print("           Poro Golf\n\n");
+        setZoom(3);
+        print("    Presione Enter para empezar a jugar\n\n");
+        print("          Presione Q para salir\n");
+        printPoroMenu();
         char c = getChar();
         if (c != NOT_KEY)
         {
@@ -101,6 +100,7 @@ void startGame()
         // 3) Leer rawKey y aplicar "debounce"
         char rawKey = getChar();
         char key;  // Tecla filtrada (sin repeticiones continuas)
+        
 
         if (rawKey != NOT_KEY) {
             if (rawKey == lastRawKey) {
@@ -119,6 +119,10 @@ void startGame()
 
         applyControls(&player, key);
         updateObject(&player, 1024, 768);
+
+        if (key == KEY_ESC) {
+        return;
+        }
 
         if (key == NOT_KEY) {
             applyFriction(&player, 0.05f);

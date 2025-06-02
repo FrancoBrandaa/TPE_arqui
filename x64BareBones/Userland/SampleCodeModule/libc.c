@@ -14,40 +14,48 @@
 #define CLEAN_SCREEN 30
 #define GET_CURSOR 33
 #define PUT_PIXEL 19
+#define STOP_SOUND 21
+#define PLAY_TONE 20
 
 //  uint32_t color[] = {blue, green, red, yellow, purple, cyan, orange, pink, brown, 
 //     lightGrey, lightBlue, lightGreen, lightRed, lightPink, lightBrown, darkBlue, darkGreen, 
 //     darkRed, darkYellow, darkPurple, white};
 
+
+void stopSound(void) {
+    sys_call(STOP_SOUND, 0, 0, 0,0);
+}
+void playTone(uint64_t frequency){
+    sys_call(PLAY_TONE, frequency, 0, 0,0 );
+}
 void setFontColor(uint32_t hexColor)
 {
-    sys_call(SET_FONT_COLOR, hexColor, 0, 0, 0);
+    sys_call(SET_FONT_COLOR, hexColor, 0, 0,0);
 }
 void setBackGroundColor(uint32_t hexColor)
 {
-    sys_call(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0, 0);
+    sys_call(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0,0);
 }
 
 void putPixel(uint32_t color,uint64_t x, uint64_t y){
-    sys_call(PUT_PIXEL, color , x, y);
+    sys_call(PUT_PIXEL, color , x, y,0);
 }
 
 
 printRegisters()
 {
-    sys_call(PRINT_REGISTERS, 0, 0, 0, 0);
+    sys_call(PRINT_REGISTERS, 0, 0, 0,0);
 }
 
-// definir el struct en lib.h
 dateStruct *getDate()
 {
-    dateStruct *date = sys_call(GET_DATE, 0, 0, 0, 0);
+    dateStruct *date = sys_call(GET_DATE, 0, 0, 0,0);
     return date;
 }
 
 void getCursorPos(int *x, int *y)
 {
-    sys_call(GET_CURSOR, (uint64_t)x, (uint64_t)y, 0, 0);
+    sys_call(GET_CURSOR, (uint64_t)x, (uint64_t)y, 0,0);
 }
 
 void timeToStr(char *buffer)
@@ -81,7 +89,7 @@ void printDate()
 
 void nprint(const char *buf, uint64_t lenght)
 {
-    sys_call(WRITE, STDOUT, (uint64_t)buf, (uint64_t)lenght, 0);
+    sys_call(WRITE, STDOUT, (uint64_t)buf, (uint64_t)lenght,0);
 }
 
 void drawRectangle(Point topLeft, Point downRigth, uint32_t color)
@@ -91,7 +99,7 @@ void drawRectangle(Point topLeft, Point downRigth, uint32_t color)
 
 void sleep(uint64_t seconds)
 {
-    sys_call(SLEEP, seconds, 0);
+    sys_call(SLEEP, seconds, 0,0,0);
 }
 
 void print(const char *buf)
@@ -101,7 +109,7 @@ void print(const char *buf)
 
 int scan(char *buf, uint32_t count)
 {
-    return sys_call((uint64_t)READ, (uint64_t)STDIN, (uint64_t)buf, (uint64_t)count, 0);
+    return sys_call((uint64_t)READ, (uint64_t)STDIN, (uint64_t)buf, (uint64_t)count,0);
 }
 
 int itoa(uint64_t value, char *buffer, int base, int n)
@@ -167,17 +175,17 @@ int strlen(const char *str)
 
 void cleanScreen()
 {
-    sys_call(CLEAN_SCREEN, 0, 0, 0, 0);
+    sys_call(CLEAN_SCREEN, 0, 0, 0,0);
 }
 
 void setCursor(uint32_t x, uint32_t y)
 {
-    sys_call(SET_CURSOR, x, y, 0, 0);
+    sys_call(SET_CURSOR, x, y, 0,0);
 }
 
 void setZoom(int new_zoom)
 {
-    sys_call(SET_ZOOM, new_zoom, 0, 0, 0);
+    sys_call(SET_ZOOM, new_zoom, 0, 0,0);
 }
 
 void setCharCursor(uint32_t x, uint32_t y)

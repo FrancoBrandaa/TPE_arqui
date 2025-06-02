@@ -26,6 +26,7 @@ void outb(unsigned short port, unsigned char value);
  */
 unsigned char inb(unsigned short port);
 
+//nunca la usamos 
 /**
  * @brief Retrieves the CPU vendor string.
  *
@@ -33,6 +34,8 @@ unsigned char inb(unsigned short port);
  */
 void cpuVendor(char *vendor);
 
+
+//la borraria porque no la voy a usar
 /**
  * @brief Tests a system call.
  *
@@ -40,6 +43,8 @@ void cpuVendor(char *vendor);
  */
 void testSysCall(void);
 
+
+//investigar donde esta
 /**
  * @brief Retrieves the current CPU register values.
  *

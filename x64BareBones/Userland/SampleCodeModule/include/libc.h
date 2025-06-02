@@ -38,8 +38,13 @@
 #define BASE_DIM_CHAR_Y (DIM_Y/BASE_CHAR_HEIGHT)      // Ancho de pantalla [EN CHARS BASE]
 #define BASE_DIM_CHAR_X (DIM_X/BASE_CHAR_WIDTH)       // Alto de pantalla [EN CHARS BASE]
 
-#define NOT_DRAWBLE -1
+#define NOT_DRAWBLE -1 //que onda esto
 #define NOT_KEY -2
+#define KEY_ESC 27
+#define KEY_ARROW_UP    1001
+#define KEY_ARROW_DOWN  1002
+#define KEY_ARROW_LEFT  1003
+#define KEY_ARROW_RIGHT 1004
 
 typedef struct {
 	int x;
@@ -66,6 +71,10 @@ typedef struct dateStruct {
 void putPixel(uint32_t color,uint64_t x, uint64_t y);
 
 void sleep(uint64_t seconds);
+
+void playTone(uint64_t frequency);
+
+void stopSound(void);
 
 dateStruct * getDate ();
 /**

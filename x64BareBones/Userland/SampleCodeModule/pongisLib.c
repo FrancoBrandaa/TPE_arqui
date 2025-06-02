@@ -45,7 +45,7 @@ void applyControls(Object *b, char keyPressed)
     {
         switch (keyPressed)
         {
-        case 'w': // Acelera
+        case KEY_ARROW_UP: // Acelera
             b->speed += acceleration;
             if (b->speed > maxSpeed)
                 b->speed = maxSpeed;

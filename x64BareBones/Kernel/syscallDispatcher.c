@@ -15,6 +15,8 @@ extern uint64_t * getRegisters();
 #define SYSNUM_GET_CURSOR 33
 #define SYSNUM_CLEAN_SCREEN 30
 #define SYSNUM_PUT_PIXEL 19
+#define SYSNUM_PLAY_TONE 20
+#define SYSNUM_STOP_SOUND 21
 
 
 void sys_write(FDS fd, const char *buf, size_t count) 
@@ -104,6 +106,11 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint64_t y = va_arg(args, uint64_t);
         putPixel(hexColor,  x,  y);
         ret = 0;
+    }else if (rax == SYSNUM_PLAY_TONE) {
+        uint64_t frecuency = va_arg(args, uint64_t);
+        playTone(frecuency);
+    } else if (rax == SYSNUM_STOP_SOUND) {
+        stopSound();
     }
     va_end(args);
     return ret;
