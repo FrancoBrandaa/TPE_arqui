@@ -3,6 +3,7 @@
 
 // todo lo que sean funciones especificas del juego pongis
 
+
 void drawBall(Object *b)
 {
     for (int i = -b->radius; i <= b->radius; i++)
@@ -41,11 +42,12 @@ void applyControls(Object *b, char keyPressed)
     float rotationStep = 25.0f; // Grados por tecla
     float acceleration = 2.0f;  // Aceleración por tecla
     float maxSpeed = 10.0f;     // Velocidad máxima
+
     if (keyPressed != NOT_KEY)
     {
         switch (keyPressed)
         {
-        case KEY_ARROW_UP: // Acelera
+        case 'w': // Acelera
             b->speed += acceleration;
             if (b->speed > maxSpeed)
                 b->speed = maxSpeed;
@@ -53,8 +55,8 @@ void applyControls(Object *b, char keyPressed)
 
         case 's': // Frena
             b->speed -= acceleration;
-            if (b->speed < -maxSpeed)
-                b->speed = -maxSpeed;
+            if (b->speed < 0)
+                b->speed = 0.0f;
             break;
 
         case 'a': // Rota a la izquierda
@@ -69,6 +71,54 @@ void applyControls(Object *b, char keyPressed)
             break;
         }
 
+        float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
+        float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
+        b->dx = b->speed * fx;
+        b->dy = b->speed * fy;
+    }
+}
+
+// Antes tenías:
+// void applyControls(Object *b, char keyPressed) { ... }
+
+// Reemplázalo por esta nueva versión:
+
+void applyControlsFlags(Object *b, bool wPressed, bool aPressed, bool sPressed, bool dPressed)
+{
+    float rotationStep = 25.0f;  // Grados por tecla
+    float acceleration = 2.0f;   // Aceleración por frame si mantengo presionado
+    float maxSpeed = 10.0f;      // Velocidad máxima
+
+    // 1) Si 'w' está presionado, aumento la velocidad hasta maxSpeed:
+    if (wPressed) {
+        b->speed += acceleration;
+        if (b->speed > maxSpeed)
+            b->speed = maxSpeed;
+    }
+
+    // 2) Si 's' está presionado, disminuyo la velocidad hasta 0:
+    if (sPressed) {
+        b->speed -= acceleration;
+        if (b->speed < 0.0f)
+            b->speed = 0.0f;
+    }
+
+    // 3) Si 'a' está presionado, rotar a la izquierda:
+    if (aPressed) {
+        b->angle -= rotationStep;
+    }
+
+    // 4) Si 'd' está presionado, rotar a la derecha:
+    if (dPressed) {
+        b->angle += rotationStep;
+    }
+
+    // 5) Normalizar ángulo para que quede entre [0, 360):
+    if (b->angle < 0.0f)       b->angle += 360.0f;
+    if (b->angle >= 360.0f)   b->angle -= 360.0f;
+
+    // 6) Recalcular componentes dx, dy según el nuevo ángulo y la velocidad:
+    {
         float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
         float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
         b->dx = b->speed * fx;
@@ -220,6 +270,52 @@ void updateObject(Object *b, int screenWidth, int screenHeight)
     }
     else {
         // Avanzar normalmente en Y
+        b->y = nextY;
+    }
+}
+
+void updatePlayer(Object *b, int screenWidth, int screenHeight) {
+    float nextX = b->x + b->dx;
+    float nextY = b->y + b->dy;
+    float r     = b->radius;
+    float w     = (float)screenWidth;
+    float h     = (float)screenHeight;
+
+    // ———————————————————————
+    // 1) EJE X: colisión vs paredes izquierda/derecha
+    // ———————————————————————
+    if (nextX - r < 0.0f) {
+        // Choque contra pared izquierda
+        b->x  = r;        // “Clampeamos” la posición a la coordenada mínima
+        b->dx = 0.0f;     // Anulamos solo la componente horizontal
+        // b->dy queda igual → si hay componente vertical, desliza
+    }
+    else if (nextX + r > w) {
+        // Choque contra pared derecha
+        b->x  = w - r;    // Clampeamos a la coordenada máxima
+        b->dx = 0.0f;     // Anulamos solo la componente horizontal
+    }
+    else {
+        // No hay colisión: avanzar normalmente en X
+        b->x = nextX;
+    }
+
+    // ———————————————————————
+    // 2) EJE Y: colisión vs paredes superior/inferior
+    // ———————————————————————
+    if (nextY - r < 0.0f) {
+        // Choque contra pared superior
+        b->y  = r;        // Clampeamos
+        b->dy = 0.0f;     // Anulamos solo la componente vertical
+        // b->dx queda igual → si hay componente horizontal, desliza
+    }
+    else if (nextY + r > h) {
+        // Choque contra pared inferior
+        b->y  = h - r;    // Clampeamos
+        b->dy = 0.0f;     // Anulamos solo la componente vertical
+    }
+    else {
+        // No hay colisión: avanzar normalmente en Y
         b->y = nextY;
     }
 }

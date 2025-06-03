@@ -2,7 +2,8 @@
 #define PORO_SPRITE_H
 
 #include <stdint.h>
-#include<libc.h>
+#include <libc.h>
+#include <stdbool.h>
 
 #define FIXED_SHIFT 15   // Q1.15 format
 #define ANGLES      360

@@ -15,6 +15,8 @@ static int cursorY = 0;
 #define COLOR_BLACK 0x000000
 #define COLOR_RED 0xFF0000
 
+uint32_t backBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
+
 uint32_t color = COLOR_WHITE;
 uint32_t backgroundColor = COLOR_BLACK;
 uint8_t zoom = 2; // 1;
@@ -69,6 +71,33 @@ void putPixel(uint32_t hexColor, uint64_t x, uint64_t y)
     framebuffer[offset] = (hexColor) & 0xFF;
     framebuffer[offset + 1] = (hexColor >> 8) & 0xFF;
     framebuffer[offset + 2] = (hexColor >> 16) & 0xFF;
+}
+
+void putPixelBackBuffer(uint32_t hexColor, uint64_t x, uint64_t y) {
+    if (x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT) return;
+    backBuffer[y * SCREEN_WIDTH + x] = hexColor;
+}
+
+void clearBackBuffer(uint32_t colorFondo) {
+    // Rellena cada posición del array con “colorFondo”
+    uint64_t total = (uint64_t)SCREEN_WIDTH * SCREEN_HEIGHT;
+    for (uint64_t i = 0; i < total; i++) {
+        backBuffer[i] = colorFondo;
+    }
+}
+
+void swapBuffersToVideo(void) {
+    // La dirección física de la VRAM lineal viene de VBE_mode_info->framebuffer
+    uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
+    // Cada píxel en VRAM usa 3 bytes (RGB). Aquí asumimos bpp = 32 bits (4 bytes) o 24 bits (3 bytes).
+    // Si tu modo es 32 bits (RGBA o XRGB), copia 4 bytes por píxel:
+    uint64_t totalPixels = (uint64_t)SCREEN_WIDTH * SCREEN_HEIGHT;
+    uint32_t *videoPtr = (uint32_t *)framebuffer;
+    for (uint64_t i = 0; i < totalPixels; i++) {
+        videoPtr[i] = backBuffer[i];
+    }
+    // Si tu modo fuera 24 bpp, habría que copiar 3 bytes por píxel, ajustando el pitch. 
+    // Pero en la mayoría de modos VBE 32 bpp actual, cada píxel es un uint32_t.
 }
 
 static uint8_t font_bitmap[256 * CHAR_HEIGHT] = {

@@ -37,6 +37,11 @@ void startPongis()
     }
 }
 
+static bool wPressed   = false;
+static bool aPressed   = false;
+static bool sPressed   = false;
+static bool dPressed   = false;
+static bool escPressed = false;
 void startGame()
 {
     srand_from_time(); // Inicializa la semilla aleatoria con la hora actual
@@ -80,8 +85,6 @@ void startGame()
     float threshold = hole.radius - 0.6f * ball.radius;
     float threshold2 = threshold * threshold;
 
-    char lastRawKey = NOT_KEY;
-
     while (1)
     {
         cleanScreen();
@@ -97,36 +100,49 @@ void startGame()
             }
         }
 
-        // 3) Leer rawKey y aplicar "debounce"
-        char rawKey = getChar();
-        char key;  // Tecla filtrada (sin repeticiones continuas)
-        
+        char key = getChar();
 
-        if (rawKey != NOT_KEY) {
-            if (rawKey == lastRawKey) {
-                // Es repetición automática: lo ignoramos
-                key = NOT_KEY;
-            } else {
-                // Nueva pulsación distinta a la anterior
-                key = rawKey;
-                lastRawKey = rawKey;
-            }
-        } else {
-            // No hay tecla en buffer: reiniciamos lastRawKey
-            key = NOT_KEY;
-            lastRawKey = NOT_KEY;
+        if (key == KEY_ESC) {
+            return;
         }
 
         applyControls(&player, key);
-        updateObject(&player, 1024, 768);
-
-        if (key == KEY_ESC) {
-        return;
-        }
+        updatePlayer(&player, 1024, 768);
 
         if (key == NOT_KEY) {
             applyFriction(&player, 0.05f);
         }
+
+        // // 2) Actualizar flags make/break:
+        // switch (key) {
+        //     case 'w':  wPressed = true;   break;
+        //     case 'W':  wPressed = false;  break;
+        //     case 'a':  aPressed = true;   break;
+        //     case 'A':  aPressed = false;  break;
+        //     case 's':  sPressed = true;   break;
+        //     case 'S':  sPressed = false;  break;
+        //     case 'd':  dPressed = true;   break;
+        //     case 'D':  dPressed = false;  break;
+        //     case KEY_ESC:  escPressed = true;   break;
+        //     case 'E':      escPressed = false;  break;
+        //     default:       /* no cambia flags */ break;
+        // }
+
+        // // 3) Si presionaron ESC, salir:
+        // if (escPressed) {
+        //     return;
+        // }
+
+        // // 4) Aplicar movimiento continuo según flags:
+        // applyControlsFlags(&player, wPressed, aPressed, sPressed, dPressed);
+
+        // // 5) Si ninguna tecla está presionada, aplicar fricción:
+        // if (!wPressed && !aPressed && !sPressed && !dPressed) {
+        //     applyFriction(&player, 0.05f);
+        // }
+
+        // // 6) Actualizar posición del jugador con colisión contra bordes:
+        // updatePlayer(&player, 1024, 768);
 
         updateObject(&ball, 1024, 768);
 

@@ -114,6 +114,75 @@ void keyboard_handler() {
             }
         }
     }
+
+    // // 3) Detectar Escape (make = 0x01, break = 0x81) → encolamos 27 o ‘E’/‘e’
+    // if ((scancode & 0x7F) == 0x01) {
+    //     int next = (bufferHead + 1) % BUFFER_SIZE;
+    //     if (next != bufferTail) {
+    //         // make code: scancode == 0x01 → encolamos 27 (ASCII ESC)
+    //         if ((scancode & 0x80) == 0) {
+    //             keyBuffer[bufferHead] = 27;
+    //         }
+    //         // break code: scancode == 0x81 → encolamos 'E' (para indicar “ESC up”)
+    //         else {
+    //             keyBuffer[bufferHead] = 'E';
+    //         }
+    //         bufferHead = next;
+    //     }
+    //     return;
+    // }
+
+    // // 4) Procesar W, A, S, D (make < 0x80 encola minúscula; break ≥ 0x80 encola mayúscula)
+    // if ((scancode & 0x7F) == 0x11) {
+    //     // Scancode W: make = 0x11, break = 0x91
+    //     int next = (bufferHead + 1) % BUFFER_SIZE;
+    //     if (next != bufferTail) {
+    //         keyBuffer[bufferHead] = ((scancode & 0x80) == 0) ? 'w' : 'W';
+    //         bufferHead = next;
+    //     }
+    //     return;
+    // }
+    // if ((scancode & 0x7F) == 0x1E) {
+    //     // Scancode A: make = 0x1E, break = 0x9E
+    //     int next = (bufferHead + 1) % BUFFER_SIZE;
+    //     if (next != bufferTail) {
+    //         keyBuffer[bufferHead] = ((scancode & 0x80) == 0) ? 'a' : 'A';
+    //         bufferHead = next;
+    //     }
+    //     return;
+    // }
+    // if ((scancode & 0x7F) == 0x1F) {
+    //     // Scancode S: make = 0x1F, break = 0x9F
+    //     int next = (bufferHead + 1) % BUFFER_SIZE;
+    //     if (next != bufferTail) {
+    //         keyBuffer[bufferHead] = ((scancode & 0x80) == 0) ? 's' : 'S';
+    //         bufferHead = next;
+    //     }
+    //     return;
+    // }
+    // if ((scancode & 0x7F) == 0x20) {
+    //     // Scancode D: make = 0x20, break = 0xA0
+    //     int next = (bufferHead + 1) % BUFFER_SIZE;
+    //     if (next != bufferTail) {
+    //         keyBuffer[bufferHead] = ((scancode & 0x80) == 0) ? 'd' : 'D';
+    //         bufferHead = next;
+    //     }
+    //     return;
+    // }
+
+    // // 5) Para cualquier otro scancode válido (< 0x80), encolamos su ASCII normal
+    // if (scancode < 0x80 && (scancode & 0x80) == 0) {
+    //     int ascii = isShiftPressed
+    //                 ? shift_ascii[scancode]
+    //                 : scancode_to_ascii[scancode];
+    //     if (ascii != 0) {
+    //         int next = (bufferHead + 1) % BUFFER_SIZE;
+    //         if (next != bufferTail) {
+    //             keyBuffer[bufferHead] = ascii;
+    //             bufferHead = next;
+    //         }
+    //     }
+    // }
 }
 
 
