@@ -17,7 +17,8 @@ extern uint64_t * getRegisters();
 #define SYSNUM_PUT_PIXEL 19
 #define SYSNUM_PLAY_TONE 20
 #define SYSNUM_STOP_SOUND 21
-
+#define SYSNUM_SPECIAL_KEYS 23
+#define SYSNUM_VBE_INFO 9
 
 void sys_write(FDS fd, const char *buf, size_t count) 
 {
@@ -80,24 +81,20 @@ void syscallDispatcher(uint64_t rax, ...) {
     }else if (rax == SYSNUM_SLEEP) {
         int seconds = va_arg(args, int);
         sleep(seconds);  
-    } else if (rax == SYSNUM_SHOW_REGISTERS) 
-    {
+    } else if (rax == SYSNUM_SHOW_REGISTERS) {
         uint64_t * regs = getRegisters();
         showRegisters(regs);
         ret = 0;
-    }else if (rax == SYSNUM_GET_CURSOR) 
-    {
+    }else if (rax == SYSNUM_GET_CURSOR) {
         int* x = va_arg(args, int*);
         int* y = va_arg(args, int*);
         getCursorPos(x, y);
         ret = 0;
-    }else if (rax == SYSNUM_SET_ZOOM) 
-    {
+    }else if (rax == SYSNUM_SET_ZOOM) {
         int new_zoom = va_arg(args, int);
         vd_setZoom(new_zoom);
         ret = 0;
-    }else if (rax == SYSNUM_CLEAN_SCREEN) 
-    {
+    }else if (rax == SYSNUM_CLEAN_SCREEN) {
         vd_cleanScreen();
         ret = 0;
     }else if(rax == SYSNUM_PUT_PIXEL){
@@ -111,7 +108,19 @@ void syscallDispatcher(uint64_t rax, ...) {
         playTone(frecuency);
     } else if (rax == SYSNUM_STOP_SOUND) {
         stopSound();
-    }
+     }  //else if (rax == SYSNUM_SPECIAL_KEYS) {
+    //     // Ahora la syscall recibe:
+    //     //    1) keyCode (int)  → código ASCII (0..127)
+    //     // Retorna 0 (liberada) o 1 (presionada)
+
+    //     int keyCode = (int) va_arg(args, uint64_t);
+
+    //     if (keyCode >= 0 && keyCode < MAX_KEY_CODES) {
+    //         ret = (uint64_t) keyStates[keyCode];
+    //     } else {
+    //         ret = 0;  // Si el keyCode está fuera de rango, devolvemos "liberada"
+    //     }
+    // }
     va_end(args);
     return ret;
 }

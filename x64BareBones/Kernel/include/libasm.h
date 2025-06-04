@@ -26,15 +26,6 @@ void outb(unsigned short port, unsigned char value);
  */
 unsigned char inb(unsigned short port);
 
-//nunca la usamos 
-/**
- * @brief Retrieves the CPU vendor string.
- *
- * @param vendor A buffer to store the CPU vendor string.
- */
-void cpuVendor(char *vendor);
-
-
 //la borraria porque no la voy a usar
 /**
  * @brief Tests a system call.

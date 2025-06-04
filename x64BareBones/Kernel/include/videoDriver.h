@@ -6,8 +6,9 @@
 #define VIDEODRIVER_H
 // Function declarations and macros for the video driver
 
-#define DIM_X 1024
-#define DIM_Y 768
+
+// #define DIM_X 1024
+// #define DIM_Y 768
 
 #define CHAR_WIDTH 8
 #define CHAR_HEIGHT 16

@@ -18,6 +18,17 @@ void drawBall(Object *b)
     }
 }
 
+// float radiusByLevel(int level)
+// {
+//     switch (level)
+//     {
+//         case 1: return 50.0f;
+//         case 2: return 40.0f;
+//         case 3: return 30.0f;
+//         default: return 30.0f;
+//     }
+// }
+
 static unsigned int rand_seed = 2463534242U;
 
 void srand_from_time() 
@@ -371,8 +382,8 @@ printPoroMenu(void)
 {
     int scale = 10; // Cambia este valor para agrandar/reducir el sprite
     int sprite_size = 32;
-    int offset_x = 50;
-    int offset_y = 350;
+    int offset_x = 650;
+    int offset_y = 100;
 
     for (int y = 0; y < sprite_size; y++)
     {

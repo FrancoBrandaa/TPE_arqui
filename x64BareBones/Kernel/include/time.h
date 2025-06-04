@@ -16,5 +16,6 @@ void timer_handler();
 int ticks_count();
 int seconds_count();
 dateStruct * get_time (); 
+void sleep(int microseconds);
 
 #endif

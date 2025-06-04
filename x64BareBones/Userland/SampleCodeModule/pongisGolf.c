@@ -1,34 +1,130 @@
 #include <libc.h>
 #include <pongisLib.h>
 #define ANGLES 360
+static int current_level = 1;
+static const char* options[] = { "Jugar (1 jugador)", "Seleccionar Nivel" ,"Salir" };
+static const int nopt = sizeof(options) / sizeof(options[0]);
 
-// NO SE USA, NO LA BORRO POR PAJA
-//  void setSpeed(Object * ball , float vx, float vy){
-//          ball->dx = vx;
-//          ball->dy = vy;
-//  }
 
-void startPongis()
+static void drawMenu(int selected) 
 {
+    setBackGroundColor(black);
+    cleanScreen();
+    setZoom(5);
+    setFontColor(blue);
+    print("        Poro Golf\n\n");
+
+    setZoom(3);
+    for (int i = 0; i < nopt; i++) 
+    {
+        print(" ");
+        print(options[i]);
+        if (i == selected) print("  <--");
+        print("\n\n");
+    }
+
+    printPoroMenu();
+}
+
+void startPongis() {
+    int selected = 0;
+    drawMenu(selected);
+
+    while (1) {
+        char c = getChar();
+        if (c == NOT_KEY) continue;
+
+        if (c == 'w') {               // subir
+            selected = (selected + nopt - 1) % nopt;
+            drawMenu(selected);
+        }
+        else if (c == 's') {          // bajar
+            selected = (selected + 1) % nopt;
+            drawMenu(selected);
+        }
+        else if (c == '\n' || c == '\r') {
+            // 3) actúo según el índice seleccionado
+            switch (selected) {
+                case 0:  current_level = 1; startGame();    break;
+                case 1:  shell();                           break;
+                case 2:  shell();                           break;
+                // case 3:  otraAcción();                       break;
+                default: return;
+            }
+            return;
+        }
+    }
+}
+
+// void startPongis()
+// {
+
+//     cleanScreen();
+//     // franc se la come
+//     setZoom(4);
+//     setFontColor(blue);
+//     print("           Poro Golf\n\n");
+//     setZoom(3);
+//     print("    Presione Enter para empezar a jugar\n\n");
+//     print("          Presione Q para salir\n");
+//     printPoroMenu();
+
+//     while (1)
+//     {
+//         char c = getChar();
+//         if (c != NOT_KEY)
+//         {
+//             if (c == '\n' || c == '\r')
+//             {
+//                 current_level = 1;
+//                 startGame();
+//             }
+
+//             if (c == 'q')
+//             {
+//                 shell();
+//             }
+//         }
+//     }
+// }
+
+float radiusByLevel(int level)
+{
+    switch (level)
+    {
+    case 1:
+        return 50.0f;
+    case 2:
+        return 40.0f;
+    case 3:
+        return 30.0f;
+    default:
+        return 30.0f;
+    }
+}
+
+void win()
+{
+    setBackGroundColor(black);
+    cleanScreen();
+    setZoom(4);
+    setFontColor(green);
+    print("        NIVEL ");
+    printInt(current_level);
+    print(" SUPERADO\n\n");
+    setZoom(3);
+    (current_level < 3) ? print("Presione Enter para jugar el proximo\nnivel.\n") : print("Has completado el juego!\n");
+    print("\nPresione Q para salir.\n");
     while (1)
     {
-        cleanScreen();
-        // franc se la come
-        setZoom(4);
-        setFontColor(blue);
-        print("           Poro Golf\n\n");
-        setZoom(3);
-        print("    Presione Enter para empezar a jugar\n\n");
-        print("          Presione Q para salir\n");
-        printPoroMenu();
         char c = getChar();
         if (c != NOT_KEY)
         {
-            if (c == '\n' || c == '\r')
+            if ((c == '\n' || c == '\r') && current_level < 3)
             {
+                current_level++;
                 startGame();
             }
-
             if (c == 'q')
             {
                 shell();
@@ -37,49 +133,45 @@ void startPongis()
     }
 }
 
-static bool wPressed   = false;
-static bool aPressed   = false;
-static bool sPressed   = false;
-static bool dPressed   = false;
-static bool escPressed = false;
+
 void startGame()
 {
+    setBackGroundColor(green);
     srand_from_time(); // Inicializa la semilla aleatoria con la hora actual
     cleanScreen();
 
-     Object ball = 
-     {
-        .x      = 100.0f,
-        .y      = 100.0f,
-        .dx     = 0.0f,
-        .dy     = 0.0f,
-        .speed  = 0.0f,      // La pelota comienza quieta
-        .angle  = 0.0f,      // El ángulo no importa al inicio
-        .radius = 20.0f,
-        .color  = COLOR_GREEN
-    };
+    float hole_radius = radiusByLevel(current_level);
+
+    Object ball =
+        {
+            .x = 100.0f,
+            .y = 100.0f,
+            .dx = 0.0f,
+            .dy = 0.0f,
+            .speed = 0.0f, // La pelota comienza quieta
+            .angle = 0.0f, // El ángulo no importa al inicio
+            .radius = 20.0f,
+            .color = red};
 
     Object player = {
-        .x      = 400.0f,
-        .y      = 100.0f,
-        .dx     = 0.0f,
-        .dy     = 0.0f,
-        .speed  = 0.0f,      // El jugador parte sin velocidad
-        .angle  = 0.0f,      // Mirando hacia la derecha (0°)
+        .x = 400.0f,
+        .y = 100.0f,
+        .dx = 0.0f,
+        .dy = 0.0f,
+        .speed = 0.0f, // El jugador parte sin velocidad
+        .angle = 0.0f, // Mirando hacia la derecha (0°)
         .radius = 20.0f,
-        .color  = COLOR_WHITE
-    };
+        .color = white};
 
     Object hole = {
-    .x      = 100 + rand() % (1024 - 200), // entre 100 y 924
-    .y      = 100 + rand() % (768 - 200),  // entre 100 y 668
-    .dx     = 0.0f,                        // no hace falta dx/dy
-    .dy     = 0.0f,
-    .speed  = 0.0f,
-    .angle  = 0.0f,
-    .radius = 30.0f,
-    .color  = COLOR_RED
-};
+        .x = 100 + rand() % (1024 - 200), // entre 100 y 924
+        .y = 100 + rand() % (768 - 200),  // entre 100 y 668
+        .dx = 0.0f,                       // no hace falta dx/dy
+        .dy = 0.0f,
+        .speed = 0.0f,
+        .angle = 0.0f,
+        .radius = hole_radius, // Radio del hoyo según el nivel
+        .color = black};
 
     // Umbral al 60% para "caida en el hoyo"
     float threshold = hole.radius - 0.6f * ball.radius;
@@ -101,52 +193,22 @@ void startGame()
         }
 
         char key = getChar();
-
-        if (key == KEY_ESC) {
-            return;
-        }
+        if (key == KEY_ESC)
+            win();
+            //startPongis();
 
         applyControls(&player, key);
         updatePlayer(&player, 1024, 768);
 
-        if (key == NOT_KEY) {
+        if (key == NOT_KEY)
+        {
             applyFriction(&player, 0.05f);
         }
 
-        // // 2) Actualizar flags make/break:
-        // switch (key) {
-        //     case 'w':  wPressed = true;   break;
-        //     case 'W':  wPressed = false;  break;
-        //     case 'a':  aPressed = true;   break;
-        //     case 'A':  aPressed = false;  break;
-        //     case 's':  sPressed = true;   break;
-        //     case 'S':  sPressed = false;  break;
-        //     case 'd':  dPressed = true;   break;
-        //     case 'D':  dPressed = false;  break;
-        //     case KEY_ESC:  escPressed = true;   break;
-        //     case 'E':      escPressed = false;  break;
-        //     default:       /* no cambia flags */ break;
-        // }
-
-        // // 3) Si presionaron ESC, salir:
-        // if (escPressed) {
-        //     return;
-        // }
-
-        // // 4) Aplicar movimiento continuo según flags:
-        // applyControlsFlags(&player, wPressed, aPressed, sPressed, dPressed);
-
-        // // 5) Si ninguna tecla está presionada, aplicar fricción:
-        // if (!wPressed && !aPressed && !sPressed && !dPressed) {
-        //     applyFriction(&player, 0.05f);
-        // }
-
-        // // 6) Actualizar posición del jugador con colisión contra bordes:
-        // updatePlayer(&player, 1024, 768);
-
         updateObject(&ball, 1024, 768);
 
-        if (checkCollision(&player, &ball)) {
+        if (checkCollision(&player, &ball))
+        {
             // 4.1) Copiar velocidad y dirección del player
             ball.speed = player.speed;
             ball.angle = player.angle;
@@ -169,13 +231,13 @@ void startGame()
             //      4.3.2) Calcular dx_i, dy_i en enteros
             int dx_i = bx - px;
             int dy_i = by - py;
-            uint32_t dist2 = (uint32_t)((uint32_t)dx_i * (uint32_t)dx_i
-                                     + (uint32_t)dy_i * (uint32_t)dy_i);
+            uint32_t dist2 = (uint32_t)((uint32_t)dx_i * (uint32_t)dx_i + (uint32_t)dy_i * (uint32_t)dy_i);
 
             //      4.3.3) Obtener dist = floor(sqrt(dist2)) con isqrt
             uint32_t dist = isqrt(dist2);
-            if (dist == 0) {
-                dist = 1;  // Para evitar división por cero
+            if (dist == 0)
+            {
+                dist = 1; // Para evitar división por cero
             }
 
             //      4.3.4) Vector unitario en Q8.8 (factor = 256)
@@ -205,15 +267,7 @@ void startGame()
 
         if (dist2 <= threshold2)
         {
-            // 3) Mostrar pantalla de victoria y salir del bucle
-            cleanScreen();
-            //setCursor(400, 350); // Ajusta posición del texto a tu gusto
-            setZoom(3);
-            setFontColor(red);
-            print("\nGANASTE EL JUEGO!\n\n");
-            print("Presiona cualquier tecla para salir...\n");
-            while (getChar() == NOT_KEY); 
-            startPongis(); // Reiniciar el juego
+            win();
         }
 
         // applyFriction(&player, 0.5f);

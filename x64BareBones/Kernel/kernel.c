@@ -8,6 +8,7 @@
 #include <defs.h>
 #include <time.h>
 #include <keyboardDriver.h>
+#include<soundDriver.h>
 #include <videoDriver.h>
 extern uint8_t text;
 extern uint8_t rodata;
@@ -97,6 +98,10 @@ void * initializeKernelBinary()
 
 int main()
 {	
+
+	// playTone(440);
+	// sleep(5);
+	// stopSound();
 	//Carga la Interrupt Descriptor Table (IDT)
 	load_idt(); //Manejo de interrupciones y syscalls
 	//Realiza un salto al código de userland

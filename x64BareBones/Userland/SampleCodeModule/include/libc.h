@@ -136,6 +136,15 @@ void print(const char * buf);
  */
 void nprint(const char * buf, uint64_t lenght);
 
+
+
+/**
+ * @brief Prints an integer value to the display.
+ *
+ * @param value The integer value to print.
+ */
+void printInt(int value);
+
 /**
  * @brief Reads input from the user into a buffer.
  * 

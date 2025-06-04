@@ -1831,7 +1831,11 @@ void vd_setFontColor(uint32_t hexColor)
     replaceColor(oldColor, hexColor);
 }
 
-void replaceColor(uint32_t oldColor, uint32_t newColor) {
+void replaceColor(uint32_t oldColor, uint32_t newColor)
+{
+
+
+
     uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
     uint64_t width = VBE_mode_info->width;
     uint64_t height = VBE_mode_info->height;
@@ -1898,7 +1902,6 @@ void vd_printstr(FDS fd, const char *buf, size_t count)
     int i = 0;
     while (i < count)
     {
-
         vd_putChar(*buf++, fd);
         i++;
     }
