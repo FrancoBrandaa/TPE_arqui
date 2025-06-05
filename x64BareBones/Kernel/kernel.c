@@ -101,7 +101,7 @@ int main()
 	//Carga la Interrupt Descriptor Table (IDT)
 	load_idt(); //Manejo de interrupciones y syscalls
 	drawCircle(100,100,100,0x00FF0000);
-	//playTone(200,4000); //para testing
+	playTone(200,4000); //para testing
 	//Realiza un salto al código de userland
 	((EntryPoint)sampleCodeModuleAddress)();
 	haltcpu();
