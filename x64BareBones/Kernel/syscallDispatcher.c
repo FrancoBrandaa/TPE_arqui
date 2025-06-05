@@ -12,13 +12,12 @@ extern uint64_t * getRegisters();
 #define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
 #define SYSNUM_SET_ZOOM 13
 #define SYSNUM_SLEEP 32
-#define SYSNUM_GET_CURSOR 33
 #define SYSNUM_CLEAN_SCREEN 30
 #define SYSNUM_PUT_PIXEL 19
 #define SYSNUM_PLAY_TONE 20
-#define SYSNUM_STOP_SOUND 21
 #define SYSNUM_SPECIAL_KEYS 23
 #define SYSNUM_VBE_INFO 9
+#define SYSNUM_DRAW_CIRCLE 21
 
 void sys_write(FDS fd, const char *buf, size_t count) 
 {
@@ -85,11 +84,6 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint64_t * regs = getRegisters();
         showRegisters(regs);
         ret = 0;
-    }else if (rax == SYSNUM_GET_CURSOR) {
-        int* x = va_arg(args, int*);
-        int* y = va_arg(args, int*);
-        getCursorPos(x, y);
-        ret = 0;
     }else if (rax == SYSNUM_SET_ZOOM) {
         int new_zoom = va_arg(args, int);
         vd_setZoom(new_zoom);
@@ -105,10 +99,22 @@ void syscallDispatcher(uint64_t rax, ...) {
         ret = 0;
     }else if (rax == SYSNUM_PLAY_TONE) {
         uint64_t frecuency = va_arg(args, uint64_t);
-        playTone(frecuency);
-    } else if (rax == SYSNUM_STOP_SOUND) {
-        stopSound();
-     }  //else if (rax == SYSNUM_SPECIAL_KEYS) {
+        uint64_t delay = va_arg(args, uint64_t);
+        playTone(frecuency,delay);
+    }else if(rax == SYSNUM_VBE_INFO){
+        neededInfo x = va_arg(args, neededInfo); //puntero a structura
+        ret = getVbeInfo(x); //cero si funca bien
+    }else if(rax == SYSNUM_DRAW_CIRCLE){
+        uint64_t x = va_arg(args, uint64_t);
+        uint64_t y = va_arg(args, uint64_t);
+        uint64_t radius = va_arg(args, uint64_t);
+        uint32_t hexColor = va_arg(args, uint32_t);
+        drawCircle(x, y, radius, hexColor);
+        ret = 0;
+    }
+     
+     
+      //else if (rax == SYSNUM_SPECIAL_KEYS) {
     //     // Ahora la syscall recibe:
     //     //    1) keyCode (int)  → código ASCII (0..127)
     //     // Retorna 0 (liberada) o 1 (presionada)

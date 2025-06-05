@@ -198,14 +198,14 @@ void startGame()
             //startPongis();
 
         applyControls(&player, key);
-        updatePlayer(&player, 1024, 768);
+        updatePlayer(&player, 1024, 768); //magic numbers de los tamnaos cambiar
 
         if (key == NOT_KEY)
         {
-            applyFriction(&player, 0.05f);
+            applyFriction(&player, 0.05f); //magic number
         }
 
-        updateObject(&ball, 1024, 768);
+        updateObject(&ball, 1024, 768); //magic number
 
         if (checkCollision(&player, &ball))
         {

@@ -27,10 +27,9 @@ static void * const sampleCodeModuleAddress = (void*)0x400000; //en que direccio
 static void * const sampleDataModuleAddress = (void*)0x500000;
 
 typedef int (*EntryPoint)();
-//PARTE DE LOS EJERICIOS
-void imprimir_arqui();
+
 //void print(char* message);
-void vga_puts(const char* str);
+//void vga_puts(const char* str);  
 
 void clearBSS(void * bssAddress, uint64_t bssSize)
 {
@@ -98,42 +97,13 @@ void * initializeKernelBinary()
 
 int main()
 {	
-
-	// playTone(440);
-	// sleep(5);
-	// stopSound();
+	
 	//Carga la Interrupt Descriptor Table (IDT)
 	load_idt(); //Manejo de interrupciones y syscalls
+	drawCircle(100,100,100,0x00FF0000);
+	//playTone(200,4000); //para testing
 	//Realiza un salto al código de userland
 	((EntryPoint)sampleCodeModuleAddress)();
-	//Detiene el cpu, normalmente no se ejecuta porque el userland toma el control pero es una medida
-	//de seguridad por si el userland retorna
 	haltcpu();
-	// ncPrint("[Kernel Main]");
-	// ncNewline();
-	// ncPrint("  Sample code module at 0x");
-	// ncPrintHex((uint64_t)sampleCodeModuleAddress);
-	// ncNewline();
-	// ncPrint("  Calling the sample code module returned: ");
-	// ncPrintHex(((EntryPoint)sampleCodeModuleAddress)());
-	// ncNewline();
-	// ncNewline();
-
-	// ncPrint("  Sample data module at 0x");
-	// ncPrintHex((uint64_t)sampleDataModuleAddress);
-	// ncNewline();
-	// ncPrint("  Sample data module contents: ");
-	// ncPrint((char*)sampleDataModuleAddress);
-	// ncNewline();
-
-	// startShell();  // Iniciar shell después de init
-
-	// ncPrint("[Finished]");
-
-	//imprimir_arqui();
-	//vga_puts("habia una vez una vaca sentada en un plato de madera");
-
-
-
 	return 0;	
 }

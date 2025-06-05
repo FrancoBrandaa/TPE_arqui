@@ -17,13 +17,6 @@
  *   • To enable the speaker, read port 0x61 and OR with 0x03.
  *   • To disable the speaker, AND port 0x61 with 0xFC.
  */
-void playTone(unsigned int frequency);
+void playTone(int frequency, int duration_ms);
 
 
-
-/**
- * @brief Stops the sound on the PC speaker.
- *
- * This function disables the speaker by clearing the appropriate bits in port 0x61.
- */
-void stopSound(void);

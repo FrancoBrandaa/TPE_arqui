@@ -17,7 +17,11 @@
 #define ZOOM_MAX 5
 #define ZOOM_MIN 1
 
-
+struct vbeInfo {
+    uint16_t width;        // width in pixels
+    uint16_t height;  
+};
+typedef struct vbeInfo * neededInfo;
 
 #define CHAR_WIDTH (BASE_CHAR_WIDTH*zoom_user)       // Ancho de un char actual [EN PIXELES]
 #define CHAR_HEIGHT (BASE_CHAR_HEIGHT*zoom_user)     // Alto de un char actual [EN PIXELES]
@@ -27,10 +31,12 @@
 #define COMMAND_LINE_X (2*BASE_CHAR_WIDTH)            // Pos de x de la linea de comandos [EN PIXELES]
 #define COMMAND_LINE_Y (DIM_Y-(2*CHAR_HEIGHT))        // Pos de y de la linea de comandos [EN PIXELES]
 #define COMMAND_LINE_Y_exec (DIM_Y-(20*CHAR_HEIGHT))        // Pos de y del comando en la shell [EN PIXELES]
+#define COMMAND_DIM ((BASE_DIM_CHAR_X - 4) * 2)
 
-
-#define DIM_X 1024          // Ancho de pantalla [EN PIXELES]
-#define DIM_Y 768           // Alto de pantalla [EN PIXELES]
+extern uint16_t DIM_X;
+extern uint16_t DIM_Y;
+// #define DIM_X 1024          // Ancho de pantalla [EN PIXELES]
+// #define DIM_Y 768           // Alto de pantalla [EN PIXELES]
 
 #define BASE_CHAR_WIDTH 8           // Ancho de un char base [EN PIXELES]
 #define BASE_CHAR_HEIGHT 16         // Ancho de un char base [EN PIXELES]
@@ -39,12 +45,8 @@
 #define BASE_DIM_CHAR_X (DIM_X/BASE_CHAR_WIDTH)       // Alto de pantalla [EN CHARS BASE]
 
 #define NOT_DRAWBLE -1 //que onda esto
-#define NOT_KEY -2
-#define KEY_ESC 27
-#define KEY_ARROW_UP    1001
-#define KEY_ARROW_DOWN  1002
-#define KEY_ARROW_LEFT  1003
-#define KEY_ARROW_RIGHT 1004
+#define NOT_KEY -2 //pidir al kernel
+#define KEY_ESC 27  //pedir al kernel
 
 typedef struct {
 	int x;
@@ -68,13 +70,22 @@ typedef struct dateStruct {
 } dateStruct;
 
 
+int initScreenSize(void);
+int getVbeInfo(neededInfo info);
+/**
+ * @brief Puts a pixel on the screen at the specified coordinates with the given color.
+ * 
+ * @param hexColor The color of the pixel in hexadecimal format.
+ * @param x The x-coordinate of the pixel.
+ * @param y The y-coordinate of the pixel.
+ */
 void putPixel(uint32_t color,uint64_t x, uint64_t y);
 
 void sleep(uint64_t seconds);
 
-void playTone(uint64_t frequency);
+void playTone(uint64_t frequency, uint64_t duration_ms);
 
-void stopSound(void);
+void drawCircle(int centerX, int centerY, int radius, uint32_t color);
 
 dateStruct * getDate ();
 /**

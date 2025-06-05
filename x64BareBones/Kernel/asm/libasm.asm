@@ -2,6 +2,7 @@ GLOBAL cpuVendor
 GLOBAL outb
 GLOBAL inb
 
+
 section .text
 	
 

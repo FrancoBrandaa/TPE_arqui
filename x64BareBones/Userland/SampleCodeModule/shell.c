@@ -4,12 +4,11 @@
 #include <libasm.h>
 #include <commands.h>
 
-#define COMMAND_DIM ((BASE_DIM_CHAR_X - 4) * 2) // maximo tamaño de comando, sacando margenes [EN CHARS BASE]
-//#define COMMAND_DIM 256 // maximo tamaño de comando, sacando margenes [EN BYTES]
+ // maximo tamaño de comando, sacando margenes [EN CHARS BASE]
+//#define COMMAND_DIM ((BASE_DIM_CHAR_X - 4) * 2)
 
 
 static char exit = 0;
-static char command[COMMAND_DIM];
 static void initializeShell();
 
 // void cmd_exit()
@@ -20,6 +19,9 @@ static void initializeShell();
     
 void shell()
 {
+    if(initScreenSize() == -1){
+        print("No se pudo obtener la informacion de la pantalla\n"); //noc como manejar esta caso. creo que es al pedo porq explota todo
+    }; //seteamos losn valoress de la pantalla
     cleanScreen();
     setFontColor(white);
     //setCursor(0, 0); // Reset cursor position to the top-left corner
@@ -31,6 +33,7 @@ void shell()
 
 void initializeShell()
 {
+    char command[COMMAND_DIM];
     int index = 0;
     while (!exit)
     {
@@ -72,46 +75,5 @@ void initializeShell()
         }
     }
 }
-
-// while (true)
-//         {
-//             char c = getChar();
-//             if (c == NOT_KEY)
-//                 continue;
-
-//             if (c == '\n' || c == '\r')
-//             {
-//                 // Fin de línea: cierra cadena y ejecuta comando
-//                 command[index] = '\0';
-//                 print("\n");
-//                 int result = runCommand(command);
-//                 (void)result;  // evitar warning si no se usa
-//                 break;
-//             }
-//             else if (c == '\b')
-//             {
-//                 // Backspace: borra del buffer y de la pantalla
-//                 if (index > 0)
-//                 {
-                        //ESTO LO HACE PABLITOOO
-//                     index--;
-//                     putChar('\b');
-//                     putChar(' ');
-//                     putChar('\b');
-//                 }
-//             }
-//             else if (index < COMMAND_DIM - 1)
-//             {
-//                 // Carácter válido: almacena y muestra
-//                 command[index++] = c;
-//                 putChar(c);
-//             }
-//             else
-//             {
-//                 // Demasiado largo: informa, reinicia buffer
-//                 print("\nComando demasiado largo\n");
-//                 index = 0;
-//                 break;
-//             }
 
 

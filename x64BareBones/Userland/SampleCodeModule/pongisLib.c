@@ -6,16 +6,17 @@
 
 void drawBall(Object *b)
 {
-    for (int i = -b->radius; i <= b->radius; i++)
-    {
-        for (int j = -b->radius; j <= b->radius; j++)
-        {
-            if (i * i + j * j <= b->radius * b->radius)
-            {
-                putPixel(b->color, b->x + i, b->y + j);
-            }
-        }
-    }
+    // for (int i = -b->radius; i <= b->radius; i++)
+    // {
+    //     for (int j = -b->radius; j <= b->radius; j++)
+    //     {
+    //         if (i * i + j * j <= b->radius * b->radius)
+    //         {
+    //             putPixel(b->color, b->x + i, b->y + j);
+    //         }
+    //     }
+    // }
+    drawCircle(b->x, b->y, b->radius, b->color);
 }
 
 // float radiusByLevel(int level)

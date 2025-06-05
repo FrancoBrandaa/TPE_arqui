@@ -1,4 +1,4 @@
-#include <stdint.h>
+
 #include <lib.h>
 
 void * memset(void * destination, int32_t c, uint64_t length)
@@ -99,7 +99,6 @@ int strLen(char * str) {
 
 //agrandar el texto antes de llamar
 void showRegisters() {
-   // sys_setZoom(2);
     uint64_t * reg = getRegisters();
     char  strs[][4] = {"rax:", "rbx:", "rcx:", "rdx:", "rdi:", "rsi:", "rsp:", "rbp:", "r8: ", "r9: ", "r10:", "r11:", "r12:", "r13:", "r14:", "r15:", "rip:", "cs: ", "rfl:"};
     char * buf = "\tRRRR 0xHHHHHHHHHHHHHHHH\n";
@@ -107,6 +106,7 @@ void showRegisters() {
         strNCpy(strs[i], buf+1, 4);
         itoa(reg[i], buf+8, 16, 16);
         buf[24] = '\n';
+		sys_write(STDERR, "\n", 1);
         sys_write(STDERR, buf, 25);
     }
 }

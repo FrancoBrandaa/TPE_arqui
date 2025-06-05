@@ -36,6 +36,8 @@ typedef struct{
     float radius;
     uint32_t color;
 }Object;
+
+void drawBall(Object *b);
 void applyFriction(Object* b, float deceleration);
 int get_sin(int angle);
 int get_cos(int angle);

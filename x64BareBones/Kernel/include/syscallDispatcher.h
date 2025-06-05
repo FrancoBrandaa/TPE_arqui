@@ -5,9 +5,11 @@
 #include <stdlib.h>
 #include<lib.h>
 #include <stdarg.h>
+#include <interrupts.h>
 #include <time.h>
 #include <videoDriver.h>
 #include <keyboardDriver.h>
+#include <soundDriver.h>
 
 
 uint64_t sysCallDispatcher(uint64_t rax, ...);

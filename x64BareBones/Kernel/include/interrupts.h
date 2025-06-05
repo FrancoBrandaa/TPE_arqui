@@ -31,6 +31,8 @@ void picMasterMask(uint8_t mask);
 
 void picSlaveMask(uint8_t mask);
 
+uint64_t * getRegisters(void); //la acabo de agregar
+
 //Termina la ejecución de la cpu.
 void haltcpu(void);
 

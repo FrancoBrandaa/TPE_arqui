@@ -35,10 +35,10 @@ unsigned char inb(unsigned short port);
 void testSysCall(void);
 
 
-//investigar donde esta
-/**
- * @brief Retrieves the current CPU register values.
- *
- * @param registers A buffer to store the register values.
- */
-void getRegisters(unsigned long *registers);
+// //investigar donde esta
+// /**
+//  * @brief Retrieves the current CPU register values.
+//  *
+//  * @param registers A buffer to store the register values.
+//  */
+// void getRegisters(unsigned long *registers);
