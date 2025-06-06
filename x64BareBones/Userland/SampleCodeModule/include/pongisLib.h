@@ -15,7 +15,8 @@ void srand(unsigned int seed);
 void srand_from_time();
 
 
-static const int16_t sin_table_q[QUAD_SIZE] = {
+static const int16_t sin_table_q[QUAD_SIZE] = 
+{
     0,    572,   1144,   1715,   2286,   2856,   3425,   3993,   4560,   5126,
     5690,   6252,   6813,   7371,   7927,   8481,   9032,   9580,  10126,  10668,
    11207,  11743,  12275,  12803,  13328,  13848,  14364,  14876,  15383,  15886,
@@ -43,6 +44,8 @@ int get_sin(int angle);
 int get_cos(int angle);
 void applyControls(Object* b);
 uint32_t isqrt(uint32_t x);
+
+void applyControlsPlayer2(Object *b);
 
 //float radiusByLevel(int level);
 

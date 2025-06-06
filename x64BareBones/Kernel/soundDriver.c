@@ -6,7 +6,8 @@
 #include <time.h>
 
 
-void playTone(int frequency, int duration_ms) {
+void playTone(int frequency, int duration_ms) 
+{
     unsigned int divisor;
     unsigned char tmp;
     unsigned long start_ticks;

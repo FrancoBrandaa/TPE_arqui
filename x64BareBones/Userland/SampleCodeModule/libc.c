@@ -64,7 +64,6 @@ void putPixel(uint32_t color,uint64_t x, uint64_t y){
     sys_call(PUT_PIXEL, color , x, y,0);
 }
 
-
 printRegisters()
 {
     sys_call(PRINT_REGISTERS, 0, 0, 0,0);

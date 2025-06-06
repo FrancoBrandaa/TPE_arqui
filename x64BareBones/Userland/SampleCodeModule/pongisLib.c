@@ -6,17 +6,17 @@
 
 void drawBall(Object *b)
 {
-    // for (int i = -b->radius; i <= b->radius; i++)
-    // {
-    //     for (int j = -b->radius; j <= b->radius; j++)
-    //     {
-    //         if (i * i + j * j <= b->radius * b->radius)
-    //         {
-    //             putPixel(b->color, b->x + i, b->y + j);
-    //         }
-    //     }
-    // }
-    drawCircle(b->x, b->y, b->radius, b->color);
+    for (int i = -b->radius; i <= b->radius; i++)
+    {
+        for (int j = -b->radius; j <= b->radius; j++)
+        {
+            if (i * i + j * j <= b->radius * b->radius)
+            {
+                putPixel(b->color, b->x + i, b->y + j);
+            }
+        }
+    }
+    //drawCircle(b->x, b->y, b->radius, b->color);
 }
 
 // float radiusByLevel(int level)
@@ -66,6 +66,40 @@ void applyControls(Object *b)
     if (isKeyPressed('d')){
         b->angle += rotationStep;
     }
+
+    float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
+    float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
+    b->dx = b->speed * fx;
+    b->dy = b->speed * fy;
+}
+
+void applyControlsPlayer2(Object *b)
+{
+    float rotationStep = 25.0f;
+    float acceleration = 2.0f;
+    float maxSpeed = 10.0f;
+
+    if (isKeyPressed('i'))
+    {
+        b->speed += acceleration;
+        if (b->speed > maxSpeed)
+            b->speed = maxSpeed;
+    }
+    
+    if (isKeyPressed('j'))
+    {
+        b->angle -= rotationStep;
+    }
+    
+    if (isKeyPressed('l'))
+    {
+        b->angle += rotationStep;
+    }
+
+    if (b->angle < 0.0f)
+        b->angle += 360.0f;
+    if (b->angle >= 360.0f)
+        b->angle -= 360.0f;
 
     float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
     float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
