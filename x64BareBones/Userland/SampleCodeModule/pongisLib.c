@@ -19,6 +19,37 @@ void drawBall(Object *b)
     //drawCircle(b->x, b->y, b->radius, b->color);  
 }
 
+void drawPlayer(const Object *p, int scale) {
+    // 1) Centramos la posición (convierte x,y float a int)
+    int cx = (int)(p->x);
+    int cy = (int)(p->y);
+
+    // 2) Normalizamos el ángulo y opcionalmente aplicamos offset
+    int angleDeg = (int)(p->angle) % 360;
+    if (angleDeg < 0) angleDeg += 360;
+    // Si el sprite original está “girado de costado”, descomenta:
+        angleDeg = (angleDeg + 90) % 360;
+
+    // 3) Dibujamos el Poro rotado y escalado
+    drawPoroRotated_LUT(cx, cy, scale, angleDeg);
+}
+
+void drawPlayer2(const Object *p, int scale) {
+    // 1) Centramos la posición (convierte x,y float a int)
+    int cx = (int)(p->x);
+    int cy = (int)(p->y);
+
+    // 2) Normalizamos el ángulo y opcionalmente aplicamos offset
+    int angleDeg = (int)(p->angle) % 360;
+    if (angleDeg < 0) angleDeg += 360;
+    // Si el sprite original está “girado de costado”, descomenta:
+        angleDeg = (angleDeg + 90) % 360;
+
+    // 3) Dibujamos el Poro rotado y escalado
+    drawPoroRotated_LUT_2(cx, cy, scale, angleDeg);
+}
+
+
 void srand_from_time() 
 {
     dateStruct *date = getDate();
@@ -319,28 +350,152 @@ void updatePlayer(Object *b, int screenWidth, int screenHeight) {
     }
 }
 
-void drawPoroRotated_LUT(int centerX, int centerY, int scale, int angleDeg)
-{
-    const int N = 32;
+void drawPoroRotated_LUT(int centerX, int centerY, int scale, int angleDeg) {
+    const int N    = 32;
     const int half = N / 2;
-    int s = get_sin(angleDeg);
-    int c = get_cos(angleDeg);
 
-    for (int y = 0; y < N; y++)
-    {
-        for (int x = 0; x < N; x++)
-        {
+    // Normalizamos el ángulo a [0, 360)
+    angleDeg %= 360;
+    if (angleDeg < 0) angleDeg += 360;
+
+    // Si el Poro en la matriz original está “de costado” por defecto,
+    // podemos ajustar angleDeg con un offset. Por ejemplo, si el sprite
+    // sin rotar aparece mirando hacia la derecha y quieres que 0° sea “arriba”,
+    // usa angleDeg += 90; (o -= 90; según tu caso).
+    //
+    // Por ejemplo:
+    //    angleDeg = (angleDeg + 90) % 360;
+    //
+    // Descomenta la línea anterior solo si efectivamente tu Poro original
+    // está “girado 90°”.
+    //
+    // angleDeg = (angleDeg + 90) % 360;
+
+    int s = get_sin(angleDeg); // Q15
+    int c = get_cos(angleDeg); // Q15
+
+    // Recorremos cada píxel de la matriz 32×32
+    for (int y = 0; y < N; y++) {
+        for (int x = 0; x < N; x++) {
             uint32_t color = poro_sprite[y * N + x];
-            if (color == 0xFF00FF)
+            if (color == 0xFF00FF) {
+                // magenta = transparencia
                 continue;
-            int dx = (x - half) * scale;
-            int dy = (y - half) * scale;
-            int rx = (dx * c - dy * s) >> FIXED_SHIFT;
-            int ry = (dx * s + dy * c) >> FIXED_SHIFT;
-            // rellena el bloque scale×scale para que no queden huecos
-            for (int yy = 0; yy < scale; yy++)
-                for (int xx = 0; xx < scale; xx++)
-                    putPixel(color, centerX + rx + xx, centerY + ry + yy);
+            }
+
+            // 1) Coordenadas centradas en (0,0)
+            int dx = x - half;  // rango: [-16 .. +15]
+            int dy = y - half;  // rango: [-16 .. +15]
+
+            // 2) Escalamos primero las coordenadas (para agrandar)
+            int dx_s = dx * scale; 
+            int dy_s = dy * scale;
+
+            // 3) Rotamos la pareja (dx_s, dy_s) con ángulo angleDeg:
+            //    [ rx ]   [  c  -s ] [ dx_s ]
+            //    [ ry ] = [  s   c ] [ dy_s ]
+            //
+            //    Y como usamos Q15, desplazamos (>>) FIXED_SHIFT al final
+            int rx = ((dx_s * c) - (dy_s * s)) >> FIXED_SHIFT;
+            int ry = ((dx_s * s) + (dy_s * c)) >> FIXED_SHIFT;
+
+            // 4) En pantalla, el píxel rotado y escalado cae en:
+            //    (centerX + rx, centerY + ry). Si scale > 1, 
+            //    cada punto rx,ry genera un bloque de scale×scale píxeles
+            //    para que el sprite no se vea “disperso”.
+            //
+            //    Por simplicidad, dibujamos un bloque de tamaño `scale`
+            //    con esquina en esa coordenada. Podrías centrar ese bloque
+            //    restando scale/2, pero no es crítico para que el sprite se vea grande.
+            //
+            int baseX = centerX + rx;
+            int baseY = centerY + ry;
+
+            // Llenamos un bloque scale×scale (para “engrosar” el píxel)
+            // Podrías dibujar solo 1×1, pero al rotar con escala a veces
+            // quedan huecos; así queda compacto.
+            for (int yy = 0; yy < scale; yy++) {
+                for (int xx = 0; xx < scale; xx++) {
+                    putPixel(color,
+                             (uint64_t)(baseX + xx),
+                             (uint64_t)(baseY + yy));
+                }
+            }
+        }
+    }
+}
+
+void drawPoroRotated_LUT_2(int centerX, int centerY, int scale, int angleDeg) {
+    const int N    = 32;
+    const int half = N / 2;
+
+    // Normalizamos el ángulo a [0, 360)
+    angleDeg %= 360;
+    if (angleDeg < 0) angleDeg += 360;
+
+    // Si el Poro en la matriz original está “de costado” por defecto,
+    // podemos ajustar angleDeg con un offset. Por ejemplo, si el sprite
+    // sin rotar aparece mirando hacia la derecha y quieres que 0° sea “arriba”,
+    // usa angleDeg += 90; (o -= 90; según tu caso).
+    //
+    // Por ejemplo:
+    //    angleDeg = (angleDeg + 90) % 360;
+    //
+    // Descomenta la línea anterior solo si efectivamente tu Poro original
+    // está “girado 90°”.
+    //
+    // angleDeg = (angleDeg + 90) % 360;
+
+    int s = get_sin(angleDeg); // Q15
+    int c = get_cos(angleDeg); // Q15
+
+    // Recorremos cada píxel de la matriz 32×32
+    for (int y = 0; y < N; y++) {
+        for (int x = 0; x < N; x++) {
+            uint32_t color = poro_sprite_2[y * N + x];
+            if (color == 0xFF00FF) {
+                // magenta = transparencia
+                continue;
+            }
+
+            // 1) Coordenadas centradas en (0,0)
+            int dx = x - half;  // rango: [-16 .. +15]
+            int dy = y - half;  // rango: [-16 .. +15]
+
+            // 2) Escalamos primero las coordenadas (para agrandar)
+            int dx_s = dx * scale; 
+            int dy_s = dy * scale;
+
+            // 3) Rotamos la pareja (dx_s, dy_s) con ángulo angleDeg:
+            //    [ rx ]   [  c  -s ] [ dx_s ]
+            //    [ ry ] = [  s   c ] [ dy_s ]
+            //
+            //    Y como usamos Q15, desplazamos (>>) FIXED_SHIFT al final
+            int rx = ((dx_s * c) - (dy_s * s)) >> FIXED_SHIFT;
+            int ry = ((dx_s * s) + (dy_s * c)) >> FIXED_SHIFT;
+
+            // 4) En pantalla, el píxel rotado y escalado cae en:
+            //    (centerX + rx, centerY + ry). Si scale > 1, 
+            //    cada punto rx,ry genera un bloque de scale×scale píxeles
+            //    para que el sprite no se vea “disperso”.
+            //
+            //    Por simplicidad, dibujamos un bloque de tamaño `scale`
+            //    con esquina en esa coordenada. Podrías centrar ese bloque
+            //    restando scale/2, pero no es crítico para que el sprite se vea grande.
+            //
+            int baseX = centerX + rx;
+            int baseY = centerY + ry;
+
+            // Llenamos un bloque scale×scale (para “engrosar” el píxel)
+            // Podrías dibujar solo 1×1, pero al rotar con escala a veces
+            // quedan huecos; así queda compacto.
+            for (int yy = 0; yy < scale; yy++) {
+                for (int xx = 0; xx < scale; xx++) {
+                    putPixel(color,
+                             (uint64_t)(baseX + xx),
+                             (uint64_t)(baseY + yy));
+                }
+            }
         }
     }
 }

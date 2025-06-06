@@ -470,7 +470,8 @@ void startGame(int numPlayers)
         {
             player1_collisions++; // Incrementar contador de colisiones
 
-            ball.speed = player1.speed;
+            float minExtra = 5.0f;
+            ball.speed = player1.speed + minExtra;
             ball.angle = player1.angle;
 
             float fx = (float)get_cos(ball.angle) / (1 << FIXED_SHIFT);
@@ -575,10 +576,10 @@ void startGame(int numPlayers)
 
         // Dibujar todos los objetos
         drawBall(&robot); // Dibujar el robot
-        drawBall(&player1);
+        drawPlayer(&player1, 2);
         if (numPlayers == 2)
         {
-            drawBall(&player2);
+            drawPlayer2(&player2, 2);
         }
         drawBall(&ball);
 
