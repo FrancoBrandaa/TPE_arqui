@@ -71,52 +71,7 @@ void startPongis()
     }
 }
 
-// void startPongis()
-// {
 
-//     cleanScreen();
-//     // franc se la come
-//     setZoom(4);
-//     setFontColor(blue);
-//     print("           Poro Golf\n\n");
-//     setZoom(3);
-//     print("    Presione Enter para empezar a jugar\n\n");
-//     print("          Presione Q para salir\n");
-//     printPoroMenu();
-
-//     while (1)
-//     {
-//         char c = getChar();
-//         if (c != NOT_KEY)
-//         {
-//             if (c == '\n' || c == '\r')
-//             {
-//                 current_level = 1;
-//                 startGame();
-//             }
-
-//             if (c == 'q')
-//             {
-//                 shell();
-//             }
-//         }
-//     }
-// }
-
-float radiusByLevel(int level)
-{
-    switch (level)
-    {
-    case 1:
-        return 50.0f;
-    case 2:
-        return 40.0f;
-    case 3:
-        return 30.0f;
-    default:
-        return 30.0f;
-    }
-}
 
 void win(int numPlayers, int winner)
 {

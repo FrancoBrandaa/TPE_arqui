@@ -12,7 +12,6 @@
 #define SET_ZOOM 13
 #define SLEEP 32
 #define CLEAN_SCREEN 30
-#define GET_CURSOR 33
 #define PUT_PIXEL 19
 #define PLAY_TONE 20
 #define VBE_GET_INFO 9
@@ -75,10 +74,6 @@ dateStruct *getDate()
     return date;
 }
 
-void getCursorPos(int *x, int *y)
-{
-    sys_call(GET_CURSOR, (uint64_t)x, (uint64_t)y, 0,0);
-}
 
 void timeToStr(char *buffer)
 {
@@ -129,11 +124,7 @@ void print(const char *buf)
     nprint(buf, strlen(buf));
 }
 
-#include <libc.h>
-// … resto de implementaciones …
 
-#include <libc.h>
-// … resto de implementaciones …
 
 void printInt(int value) {
     if (value == 0) {

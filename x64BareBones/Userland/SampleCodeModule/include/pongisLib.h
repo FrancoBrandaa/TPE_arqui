@@ -45,6 +45,8 @@ int get_cos(int angle);
 void applyControls(Object* b);
 uint32_t isqrt(uint32_t x);
 
+float radiusByLevel(int level);
+
 void applyControlsPlayer2(Object *b);
 
 //float radiusByLevel(int level);

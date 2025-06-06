@@ -2,35 +2,35 @@
 #include <libc.h>
 
 // todo lo que sean funciones especificas del juego pongis
-
+static unsigned int rand_seed = 2463534242U;
 
 void drawBall(Object *b)
 {
-    for (int i = -b->radius; i <= b->radius; i++)
-    {
-        for (int j = -b->radius; j <= b->radius; j++)
-        {
-            if (i * i + j * j <= b->radius * b->radius)
-            {
-                putPixel(b->color, b->x + i, b->y + j);
-            }
-        }
-    }
-    //drawCircle(b->x, b->y, b->radius, b->color);
+    // for (int i = -b->radius; i <= b->radius; i++)
+    // {
+    //     for (int j = -b->radius; j <= b->radius; j++)
+    //     {
+    //         if (i * i + j * j <= b->radius * b->radius)
+    //         {
+    //             putPixel(b->color, b->x + i, b->y + j);
+    //         }
+    //     }
+    // }
+    drawCircle(b->x, b->y, b->radius, b->color);  
 }
 
-// float radiusByLevel(int level)
-// {
-//     switch (level)
-//     {
-//         case 1: return 50.0f;
-//         case 2: return 40.0f;
-//         case 3: return 30.0f;
-//         default: return 30.0f;
-//     }
-// }
+float radiusByLevel(int level)
+{
+    switch (level)
+    {
+        case 1: return 50.0f;
+        case 2: return 40.0f;
+        case 3: return 30.0f;
+        default: return 30.0f;
+    }
+}
 
-static unsigned int rand_seed = 2463534242U;
+
 
 void srand_from_time() 
 {
@@ -107,8 +107,8 @@ void applyControlsPlayer2(Object *b)
     b->dy = b->speed * fy;
 }
 
-// Antes tenías:
-// void applyControls(Object *b, char keyPressed) { ... }
+
+
 
 // Reemplázalo por esta nueva versión:
 
@@ -155,7 +155,7 @@ void applyControlsFlags(Object *b, bool wPressed, bool aPressed, bool sPressed, 
     }
 }
 
-// CHEQUEO DE COLISION ENTRE objetos (pelotas)
+
 int checkCollision(Object *a, Object *b)
 {
     float dx = a->x - b->x;
@@ -167,25 +167,7 @@ int checkCollision(Object *a, Object *b)
     return distanceSquared <= radiusSum * radiusSum;
 }
 
-// void clearBall(Object* b) {
-//     for (int i = -b->radius; i <= b->radius; i++) {
-//         for (int j = -b->radius; j <= b->radius; j++) {
-//             if (i*i + j*j <= b->radius * b->radius) {
-//                 putPixel(0x000000, b->x + i, b->y + j); // negro o fondo
-//             }
-//         }
-//     }
-// }
-/**
- * Aplica una desaceleración continua (fricción) al objeto.
- * Si el objeto aún se mueve (speed diferente de 0), reduce su velocidad
- * en 'deceleration' unidades por frame, hasta llegar a cero.
- * Luego, recalcula dx y dy según el ángulo actual.
- *
- * Parámetros:
- *  - b: puntero al objeto al que se le aplica la fricción.
- *  - deceleration: magnitud de la desaceleración a aplicar cada frame.
- */
+
 void applyFriction(Object *b, float deceleration)
 {
     if (b->speed > 0.0f)

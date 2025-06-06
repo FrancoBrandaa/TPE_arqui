@@ -6,11 +6,10 @@ int strcmp(const char *s1, const char *s2);
 void printString(const char *str);
 int strncmp(const char *s1, const char *s2, size_t n);
 
-// NO SE COMO FUNCIONA INCURSOR SI NO SE INCLUYE SHELL.H
+
 
 int runCommand(const char *input)
 {
-    // setCursor(COMMAND_LINE_X, COMMAND_LINE_Y_exec);
 
     if (strcmp(input, "help") == 0)
     {
@@ -58,9 +57,6 @@ int runCommand(const char *input)
         _ioe();
     }
 
-
-
-    // if (strcmp(input, "pongis golf") == 0)
     if (strcmp(input, "pg") == 0)
     {
         startPongis();
@@ -93,7 +89,7 @@ int runCommand(const char *input)
     if (strncmp(input, "color ", 6) == 0)
     {
         const char *colorName = input + 6;
-        uint32_t colorValue = white; // default
+        uint32_t colorValue = white; 
 
         if (strcmp(colorName, "black") == 0) colorValue = black;
         else if (strcmp(colorName, "white") == 0) colorValue = white;
@@ -132,5 +128,5 @@ int runCommand(const char *input)
     }
 
     print("Comando no reconocido\n");
-    return -1; // Command not recognized
+    return -1;
 }

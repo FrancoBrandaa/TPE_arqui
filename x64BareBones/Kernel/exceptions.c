@@ -36,11 +36,11 @@ static void invalid_opcode() {
 
 void printError(char * msg){
 vd_setCursor(0,0);
-  vd_cleanScreen(); //ver si andai
+  vd_cleanScreen(); 
   sys_write(STDERR, msg, strLen(msg));
-  sleep(5);
+  sleep(5000);
   showRegisters();
-  sleep(5);
+  sleep(5000);
   sys_write(STDERR, "\n\tPress enter to return to the shell\n", 36);
   
 }

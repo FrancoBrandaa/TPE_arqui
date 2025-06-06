@@ -4,32 +4,18 @@
 #include <libasm.h>
 #include <commands.h>
 
- // maximo tamaño de comando, sacando margenes [EN CHARS BASE]
-//#define COMMAND_DIM ((BASE_DIM_CHAR_X - 4) * 2)
-
-
 static char exit = 0;
 static void initializeShell();
-
-// void cmd_exit()
-// {
-//     exit = 1;
-//     print("Exiting shell...\n");
-// }
-    
+   
 void shell()
 {
-    if(initScreenSize() == -1){
-        print("No se pudo obtener la informacion de la pantalla\n"); //noc como manejar esta caso. creo que es al pedo porq explota todo
-    }; //seteamos losn valoress de la pantalla
+    initScreenSize(); 
     cleanScreen();
     setFontColor(white);
-    //setCursor(0, 0); // Reset cursor position to the top-left corner
     setZoom(2);
     print("Los Monos TPE!\n");
     initializeShell();
 }
-
 
 void initializeShell()
 {

@@ -8,10 +8,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <libasm.h>
-// #include <libasm.h>
-// #include <random.h>
 
-//#define NULL (void*)0
 
 #define zoom_user 1
 #define ZOOM_MAX 5
@@ -33,10 +30,8 @@ typedef struct vbeInfo * neededInfo;
 #define COMMAND_LINE_Y_exec (DIM_Y-(20*CHAR_HEIGHT))        // Pos de y del comando en la shell [EN PIXELES]
 #define COMMAND_DIM ((BASE_DIM_CHAR_X - 4) * 2)
 
-extern uint16_t DIM_X;
-extern uint16_t DIM_Y;
-// #define DIM_X 1024          // Ancho de pantalla [EN PIXELES]
-// #define DIM_Y 768           // Alto de pantalla [EN PIXELES]
+extern uint16_t DIM_X;// Ancho de pantalla [EN PIXELES]
+extern uint16_t DIM_Y; // Alto de pantalla [EN PIXELES]        
 
 #define BASE_CHAR_WIDTH 8           // Ancho de un char base [EN PIXELES]
 #define BASE_CHAR_HEIGHT 16         // Ancho de un char base [EN PIXELES]
@@ -44,7 +39,6 @@ extern uint16_t DIM_Y;
 #define BASE_DIM_CHAR_Y (DIM_Y/BASE_CHAR_HEIGHT)      // Ancho de pantalla [EN CHARS BASE]
 #define BASE_DIM_CHAR_X (DIM_X/BASE_CHAR_WIDTH)       // Alto de pantalla [EN CHARS BASE]
 
-#define NOT_DRAWBLE -1 //que onda esto
 #define NOT_KEY -2 //pidir al kernel
 #define KEY_ESC 27  //pedir al kernel
 
