@@ -136,7 +136,7 @@ void win()
 
 void startGame()
 {
-    setBackGroundColor(green);
+    setBackGroundColor(darkGreen);
     srand_from_time(); // Inicializa la semilla aleatoria con la hora actual
     cleanScreen();
 
@@ -192,15 +192,10 @@ void startGame()
             }
         }
 
-        char key = getChar();
-        if (key == KEY_ESC)
-            win();
-            //startPongis();
-
-        applyControls(&player, key);
+        applyControls(&player);
         updatePlayer(&player, 1024, 768); //magic numbers de los tamnaos cambiar
 
-        if (key == NOT_KEY)
+        if (!isKeyPressed('w'))
         {
             applyFriction(&player, 0.05f); //magic number
         }

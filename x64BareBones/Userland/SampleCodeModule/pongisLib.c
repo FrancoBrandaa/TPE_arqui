@@ -49,45 +49,28 @@ void srand(unsigned int seed) {
     rand_seed = seed;
 }
 
-void applyControls(Object *b, char keyPressed)
+void applyControls(Object *b)
 {
     float rotationStep = 25.0f; // Grados por tecla
     float acceleration = 2.0f;  // Aceleración por tecla
     float maxSpeed = 10.0f;     // Velocidad máxima
 
-    if (keyPressed != NOT_KEY)
-    {
-        switch (keyPressed)
-        {
-        case 'w': // Acelera
-            b->speed += acceleration;
-            if (b->speed > maxSpeed)
-                b->speed = maxSpeed;
-            break;
-
-        case 's': // Frena
-            b->speed -= acceleration;
-            if (b->speed < 0)
-                b->speed = 0.0f;
-            break;
-
-        case 'a': // Rota a la izquierda
-            b->angle -= rotationStep;
-            break;
-
-        case 'd': // Rota a la derecha
-            b->angle += rotationStep;
-            break;
-
-        default:
-            break;
-        }
-
-        float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
-        float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
-        b->dx = b->speed * fx;
-        b->dy = b->speed * fy;
+    if (isKeyPressed('w')){
+        b->speed += acceleration;
+        if (b->speed > maxSpeed)
+            b->speed = maxSpeed;
     }
+    if(isKeyPressed('a')){
+        b->angle -= rotationStep;
+    }
+    if (isKeyPressed('d')){
+        b->angle += rotationStep;
+    }
+
+    float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
+    float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
+    b->dx = b->speed * fx;
+    b->dy = b->speed * fy;
 }
 
 // Antes tenías:

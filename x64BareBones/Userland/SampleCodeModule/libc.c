@@ -17,6 +17,7 @@
 #define PLAY_TONE 20
 #define VBE_GET_INFO 9
 #define DRAW_CIRCLE 21
+#define IS_KEY_PRESSED 23
 
 // Definición de las variables globales:
 uint16_t DIM_X = 0;
@@ -38,6 +39,10 @@ int initScreenSize(void) {
 //le paso un puntero a la estructura a llenar y si me retorna 0 es que lo lleno correctamente
 int getVbeInfo(neededInfo info){
     return sys_call(VBE_GET_INFO, info, 0, 0,0);
+}
+
+int isKeyPressed (int keyCode) {
+    return sys_call(IS_KEY_PRESSED, keyCode, 0, 0, 0);
 }
 
 void drawCircle(int centerX, int centerY, int radius, uint32_t color){
