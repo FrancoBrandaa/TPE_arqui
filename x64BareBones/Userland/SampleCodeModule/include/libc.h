@@ -247,6 +247,7 @@ enum colors{
     pink = 0xFFC0CB,
     brown = 0xA52A2A,
     lightGrey = 0xD3D3D3,
+    darkGrey = 0x555555, 
     lightBlue = 0xADD8E6,
     lightGreen = 0x90EE90,
     lightRed = 0xFFA07A,

@@ -6,31 +6,18 @@ static unsigned int rand_seed = 2463534242U;
 
 void drawBall(Object *b)
 {
-    // for (int i = -b->radius; i <= b->radius; i++)
-    // {
-    //     for (int j = -b->radius; j <= b->radius; j++)
-    //     {
-    //         if (i * i + j * j <= b->radius * b->radius)
-    //         {
-    //             putPixel(b->color, b->x + i, b->y + j);
-    //         }
-    //     }
-    // }
-    drawCircle(b->x, b->y, b->radius, b->color);  
-}
-
-float radiusByLevel(int level)
-{
-    switch (level)
+    for (int i = -b->radius; i <= b->radius; i++)
     {
-        case 1: return 50.0f;
-        case 2: return 40.0f;
-        case 3: return 30.0f;
-        default: return 30.0f;
+        for (int j = -b->radius; j <= b->radius; j++)
+        {
+            if (i * i + j * j <= b->radius * b->radius)
+            {
+                putPixel(b->color, b->x + i, b->y + j);
+            }
+        }
     }
+    //drawCircle(b->x, b->y, b->radius, b->color);  
 }
-
-
 
 void srand_from_time() 
 {
@@ -96,10 +83,10 @@ void applyControlsPlayer2(Object *b)
         b->angle += rotationStep;
     }
 
-    if (b->angle < 0.0f)
-        b->angle += 360.0f;
-    if (b->angle >= 360.0f)
-        b->angle -= 360.0f;
+    // if (b->angle < 0.0f)
+    //     b->angle += 360.0f;
+    // if (b->angle >= 360.0f)
+    //     b->angle -= 360.0f;
 
     float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
     float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
@@ -158,6 +145,7 @@ void applyControlsFlags(Object *b, bool wPressed, bool aPressed, bool sPressed, 
 
 int checkCollision(Object *a, Object *b)
 {
+    
     float dx = a->x - b->x;
     float dy = a->y - b->y;
 
