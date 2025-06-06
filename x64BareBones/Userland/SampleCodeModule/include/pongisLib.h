@@ -41,7 +41,7 @@ void drawBall(Object *b);
 void applyFriction(Object* b, float deceleration);
 int get_sin(int angle);
 int get_cos(int angle);
-void applyControls(Object* b, char keyPressed);
+void applyControls(Object* b);
 uint32_t isqrt(uint32_t x);
 
 //float radiusByLevel(int level);

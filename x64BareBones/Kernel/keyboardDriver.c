@@ -1,163 +1,164 @@
+// keyboardDriver.c
+
 #include <keyboardDriver.h>
 #include <naiveConsole.h>
 #include <videoDriver.h>
 
+#define NOT_KEY       -2
+#define BUFFER_SIZE   256
+#define KEY_ESC       27
+
+// Estado de Shift (0 = liberado; 1 = presionado)
 static int isShiftPressed = 0;
 
-//#define CHAR_BUFFER_DIM 64
-#define NOT_KEY -2
-#define BUFFER_SIZE 256
+// Buffer circular para encolar teclas (ASCII y ESC)
+static int  keyBuffer[BUFFER_SIZE];
+static int  bufferHead = 0;
+static int  bufferTail = 0;
 
+// Array que guarda, para cada código ASCII (0..127), si la tecla está presionada (1) o liberada (0)
+static char keyStates[128] = {0};
 
-#define KEY_ESC 27
-#define KEY_ARROW_UP    1001
-#define KEY_ARROW_DOWN  1002
-#define KEY_ARROW_LEFT  1003
-#define KEY_ARROW_RIGHT 1004
-static int ext_scancode = 0;
-
-// keyBuffer a int para poder encolar flechas y ESC (27)
-static int keyBuffer[BUFFER_SIZE];
-static int bufferHead = 0;
-static int bufferTail = 0;
-
-// boolean pressedKey [10] = {false};
-
-char scancode_to_ascii[128] = 
-{
-    0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
-    '\t', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0,
-    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\',
-    'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', // etc.
-    // Completa segun tu necesidad
+/**
+ * @brief  Mapa de scancode → ASCII sin Shift.
+ *         Solo se definen los valores útiles (0..127). El resto queda en 0.
+ */
+char scancode_to_ascii[128] = {
+    0,   27,  '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
+    '\t','q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0,
+    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',  0,  '\\',
+    'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',  0,   '*',  0,   ' ',
+    // (los índices 58..127 los dejamos en 0, a menos que necesites más símbolos)
 };
 
+/**
+ * @brief  Mapa de scancode → ASCII **con** Shift (para mayúsculas, signos, etc.)
+ */
 char shift_ascii[128] = {
-    0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
-    '\t', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0,
-    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0, '|',
-    'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' '
+    0,   27,  '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', '\b',
+    '\t','Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0,
+    'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0,   '|',
+    'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?',  0,   '*',  0,   ' ',
+    // (los índices 58..127 los dejamos en 0 o completarlos según tu mapa de teclas)
 };
 
+// Declaración externa que devuelve el scancode actual desde la interrupción
 extern unsigned char returnKey();
 
+
+/**
+ * @brief  Rutina de interrupción para el teclado.
+ *         - Detecta Shift (presionado/liberado).
+ *         - Detecta ESC (solo encolando el ASCII 27 en press).
+ *         - Detecta press/release de teclas ASCII estándar:
+ *           — En press: marca keyStates[ascii] = 1 y encola el ASCII en el buffer.
+ *           — En release: marca keyStates[ascii] = 0.
+ *
+ *         NO se procesa nada de flechas en esta versión.
+ */
 void keyboard_handler() {
     unsigned char scancode = returnKey();
 
-    // 1) Detectar prefijo extendido (0xE0)
-    if (scancode == 0xE0) {
-        ext_scancode = 1;
-        return;
-    }
-    if (ext_scancode) {
-        int code = 0;
-        switch (scancode) {
-            case 0x48:
-                code = KEY_ARROW_UP;
-                break;
-            case 0x50:
-                code = KEY_ARROW_DOWN;
-                break;
-            case 0x4B:
-                code = KEY_ARROW_LEFT;
-                break;
-            case 0x4D:
-                code = KEY_ARROW_RIGHT;
-                break;
-            default:
-                ext_scancode = 0;
-                return;  // No era flecha
-        }
-        ext_scancode = 0;
-        // Encolar código de flecha
-        int next = (bufferHead + 1) % BUFFER_SIZE;
-        if (next != bufferTail) {
-            keyBuffer[bufferHead] = code;
-            bufferHead = next;
-        }
-        return;
-    }
-
-    // 2) Detectar Shift presionado / liberado
+    // 1) Detectar Shift presionado o liberado (scancode 42 o 54, ó 170 ó 182 en release)
     if ((scancode & 0x7F) == 42 || (scancode & 0x7F) == 54) {
         if (!(scancode & 0x80)) {
-            // Shift presionado
+            // Shift presionado (make 42 ó 54, sin bit7)
             isShiftPressed = 1;
         } else {
-            // Shift liberado (scancode | 0x80)
+            // Shift liberado (scancode >= 0x80 con make 42 ó 54)
             isShiftPressed = 0;
         }
         return;
     }
 
-        // 3) Detectar Escape presionado
-        //    Scancode de Escape = 0x01 (y 0x81 al liberar, pero aquí solo interesa presionar)
-        if (scancode == 0x01) {
-            // Encolar ASCII 27 (Escape)
+    // 2) Detectar ESC (scancode 0x01 en press; 0x81 en release)
+    if ((scancode & 0x7F) == 0x01) {
+        if (!(scancode & 0x80)) {
+            // ESC presionado → encolar ASCII 27
             int next = (bufferHead + 1) % BUFFER_SIZE;
             if (next != bufferTail) {
-                keyBuffer[bufferHead] = 27;
+                keyBuffer[bufferHead] = KEY_ESC;
                 bufferHead = next;
             }
-            return;
         }
+        // Si scancode tiene bit7 (0x81), es release; no hacemos nada especial.
+        return;
+    }
 
-        // 4) Solo procesar scancodes válidos (< 128) y que no sean release
-        if (scancode < 0x80) {
-            int ascii = isShiftPressed
-                        ? shift_ascii[scancode]
-                        : scancode_to_ascii[scancode];
-
-            if (ascii != 0) {
-                int next = (bufferHead + 1) % BUFFER_SIZE;
-                if (next != bufferTail) {
-                    keyBuffer[bufferHead] = ascii;
-                    bufferHead = next;
-                }
+    // 3) Si es code >= 0x80: significa “liberación” de una tecla
+    if (scancode & 0x80) {
+        unsigned char make = scancode & 0x7F;  // scancode sin el bit de release
+        if (make < 128) {
+            // Determinar el ASCII sin importar Shift (en release no importa la mayúscula)
+            char ascii = scancode_to_ascii[make];
+            if (ascii != 0 && (unsigned char)ascii < 128) {
+                keyStates[(unsigned char)ascii] = 0;
             }
         }
+        return;
+    }
+
+    // 4) Si llegamos acá, es un scancode < 0x80 → “press” de tecla estándar
+    if (scancode < 0x80) {
+        // Obtener ASCII según si Shift está presionado o no
+        char ascii = isShiftPressed ? shift_ascii[scancode] : scancode_to_ascii[scancode];
+        if (ascii != 0 && (unsigned char)ascii < 128) {
+            // Marcar “presionada” para ese ASCII
+            keyStates[(unsigned char)ascii] = 1;
+
+            // Encolar el ASCII en el buffer (para getChar())
+            int next = (bufferHead + 1) % BUFFER_SIZE;
+            if (next != bufferTail) {
+                keyBuffer[bufferHead] = (int)ascii;
+                bufferHead = next;
+            }
+        }
+    }
 }
 
 
+/**
+ * @brief  Comprueba si hay alguna tecla en el buffer (no bloqueante).
+ * @return 1 si hay al menos una tecla en el buffer, 0 si está vacío.
+ */
 char hasNextKey() {
-    // Non-blocking check for pending keys
     return (bufferHead != bufferTail);
 }
 
+/**
+ * @brief  Saca el siguiente valor del buffer (ASCII o ESC).
+ * @return Código ASCII (o 27 para Escape). Si el buffer está vacío, devuelve NOT_KEY (-2).
+ */
 int nextKey() {
-    // Return next key or NOT_KEY if buffer is empty
     if (!hasNextKey()) {
         return NOT_KEY;
     }
-    char c = keyBuffer[bufferTail];
+    int c = keyBuffer[bufferTail];
     bufferTail = (bufferTail + 1) % BUFFER_SIZE;
     return c;
 }
 
+/**
+ * @brief  Bloqueante: espera hasta que haya un carácter en el buffer y lo devuelve.
+ */
+char getChar() {
+    while (bufferHead == bufferTail) {
+        // espera activa
+    }
+    int c = keyBuffer[bufferTail];
+    bufferTail = (bufferTail + 1) % BUFFER_SIZE;
+    return (char)c;
+}
 
-// void keyboard_handler() {
-//     unsigned char scancode = returnKey();
-    
-//     // Detectar Shift presionado
-//     if (scancode == 42 || scancode == 54) {
-//         isShiftPressed = 1;
-//         return;
-//     } else if (scancode == 170 || scancode == 182) {
-//         isShiftPressed = 0;
-//         return;
-//     }
-
-//     // Solo procesar scancodes válidos
-//     if (scancode < 128) {
-//         char ascii = isShiftPressed ? shift_ascii[scancode] : scancode_to_ascii[scancode];
-        
-//         if (ascii != 0) {
-//             int next = (bufferHead + 1) % BUFFER_SIZE; //RARO ESTO
-//             if (next != bufferTail) {
-//                 keyBuffer[bufferHead] = ascii;
-//                 bufferHead = next;
-//                 //putChar(ascii);  // Solo para debug
-//             }
-//         }
-//     }
-// }
+/**
+ * @brief  Función pública que devuelve 1 si la tecla ASCII keyCode está presionada,
+ *         0 si está liberada o si keyCode está fuera de rango [0..127].
+ * @param  keyCode Código ASCII de la tecla a consultar.
+ * @return 1 (presionada) o 0 (liberada/o fuera de rango).
+ */
+char isKeyPressed(int keyCode) {
+    if (keyCode < 0 || keyCode >= 128) {
+        return 0;
+    }
+    return keyStates[keyCode];
+}

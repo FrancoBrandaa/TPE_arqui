@@ -15,9 +15,10 @@ extern uint64_t * getRegisters();
 #define SYSNUM_CLEAN_SCREEN 30
 #define SYSNUM_PUT_PIXEL 19
 #define SYSNUM_PLAY_TONE 20
-#define SYSNUM_SPECIAL_KEYS 23
 #define SYSNUM_VBE_INFO 9
 #define SYSNUM_DRAW_CIRCLE 21
+#define SYSNUM_IS_KEY_PRESSED 23
+
 
 void sys_write(FDS fd, const char *buf, size_t count) 
 {
@@ -111,6 +112,11 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint32_t hexColor = va_arg(args, uint32_t);
         drawCircle(x, y, radius, hexColor);
         ret = 0;
+    } else if (rax == SYSNUM_IS_KEY_PRESSED) {
+        // El usuario pasa un keyCode (ASCII 0..127) y devolvemos 1 si está presionado o 0 si no.
+        int keyCode = (int)va_arg(args, uint64_t);
+        // Llamamos a la función de teclado que definimos en keyboardDriver.c
+        ret = (uint64_t) isKeyPressed(keyCode);
     }
      
      
