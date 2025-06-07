@@ -17,7 +17,10 @@ void waitToReturn() {
 
 void exceptionDispatcher(int exception) {
 	if (exception == ZERO_EXCEPTION_ID)
+    {
+        vd_printstr(STDERR, "EXCEPCION: Instruccion invalida detectada!\n", 44);
 		zero_division();
+    }
 	if (exception == INVALID_OPCODE)
         invalid_opcode();
 }
@@ -35,12 +38,10 @@ static void invalid_opcode() {
 }
 
 void printError(char * msg){
-vd_setCursor(0,0);
+  vd_setCursor(0,0);
   vd_cleanScreen(); 
   sys_write(STDERR, msg, strLen(msg));
-  sleep(5000);
   showRegisters();
-  sleep(5000);
   sys_write(STDERR, "\n\tPress enter to return to the shell\n", 36);
-  
+  swapBuffers();
 }

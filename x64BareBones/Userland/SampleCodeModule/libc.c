@@ -5,22 +5,26 @@
 #define WRITE 1
 #define GET_DATE 2
 #define PRINT_REGISTERS 3
-#define SET_CURSOR 5
-#define SET_FONT_COLOR 7
-#define SET_BACKGROUND_FONT_COLOR 10
-#define DRAW_RECTANGLE 6
-#define SET_ZOOM 13
-#define SLEEP 32
-#define CLEAN_SCREEN 30
-#define PUT_PIXEL 19
-#define PLAY_TONE 20
-#define VBE_GET_INFO 9
-#define DRAW_CIRCLE 21
-#define IS_KEY_PRESSED 23
+#define SET_CURSOR 4
+#define SET_FONT_COLOR 8
+#define SET_BACKGROUND_FONT_COLOR 9
+#define SET_ZOOM 10
+#define SLEEP 11
+#define CLEAN_SCREEN 7
+#define PUT_PIXEL 6
+#define PLAY_TONE 12
+#define VBE_GET_INFO 13
+#define DRAW_CIRCLE 5
+#define IS_KEY_PRESSED 14
+#define SWAP_BUFFERS 15
 
 // Definición de las variables globales:
 uint16_t DIM_X = 0;
 uint16_t DIM_Y = 0;
+
+void swapBuffers(void) {
+    sys_call(SWAP_BUFFERS, 0, 0, 0, 0);
+}
 
 int initScreenSize(void) {
     struct vbeInfo info;               // la estructura donde se guardará el ancho y alto
@@ -107,11 +111,6 @@ void printDate()
 void nprint(const char *buf, uint64_t lenght)
 {
     sys_call(WRITE, STDOUT, (uint64_t)buf, (uint64_t)lenght,0);
-}
-
-void drawRectangle(Point topLeft, Point downRigth, uint32_t color)
-{
-    sys_call(DRAW_RECTANGLE, (uint64_t)&topLeft, (uint64_t)&downRigth, (uint64_t)color, 0);
 }
 
 void sleep(uint64_t seconds)

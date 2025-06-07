@@ -42,3 +42,12 @@ void sleep(int microseconds) {
         _hlt();
     }
 }
+
+void sleepSeconds(int seconds) {
+    if (seconds <= 0) return;
+    unsigned long start = ticks;
+    uint64_t ticks_to_wait = seconds * 18;
+    while (ticks - start < ticks_to_wait) {
+        _hlt();
+    }
+}

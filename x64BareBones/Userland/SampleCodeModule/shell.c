@@ -11,7 +11,7 @@ void shell()
 {
     initScreenSize(); 
     cleanScreen();
-    setFontColor(white);
+    setFontColor(green);
     setZoom(2);
     print("Los Monos TPE!\n");
     initializeShell();
@@ -27,6 +27,7 @@ void initializeShell()
         index = 0;
         while (1)
         {
+            swapBuffers();
             char c = getChar();
             if (c != NOT_KEY)
             { 

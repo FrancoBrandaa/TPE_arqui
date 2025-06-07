@@ -36,14 +36,6 @@ typedef struct {
  */
 void putPixel(uint32_t hexColor, uint64_t x, uint64_t y);
 
-/**
- * @brief Draws a filled rectangle on the screen.
- * 
- * @param topLeft Pointer to the top-left corner point of the rectangle.
- * @param downRigth Pointer to the bottom-right corner point of the rectangle.
- * @param c The color of the rectangle in hexadecimal format.
- */
-void drawRectangle(Point* topLeft, Point* downRigth, uint32_t c);
 
 /**
  * @brief Draws a character on the screen with specified foreground and background colors.
@@ -68,7 +60,7 @@ void vd_putChar(char c, FDS fd);
  * @param radius The radius of the circle.
  * @param color The color of the circle in hexadecimal format.
  */
-void drawCircle(int centerX, int centerY, int radius, uint32_t color);
+void drawCircle(int center_x, int center_y, int radius, uint32_t color);
 void vd_setCursor(int x, int y);
 void getCursorPos(int* x, int* y);
 void vd_cleanScreen(void);
@@ -77,7 +69,18 @@ void changeBackgroundColor(uint32_t hexColor);
 void vd_setZoom(int new_zoom);
 void setFontColor(uint32_t hexColor);
 void scroll_screen(void);
-void drawCircle(int center_x, int center_y, int radius, uint32_t color);
+
+
+void vd_setCursor(int x, int y);
+void vd_setFontColor(uint32_t newColor);
+void vd_SetBackgroundColor(uint32_t newColor);
+
+
+// Double Buffering Functions
+void swapBuffers(void);
+void clearBackBuffer(uint32_t hexColor);
+
+
 static uint8_t font_bitmap[256 * CHAR_HEIGHT] = {
     // Relleno para las primeras letras (Espacio, símbolos, etc.)
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,

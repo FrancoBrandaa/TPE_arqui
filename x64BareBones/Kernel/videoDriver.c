@@ -15,12 +15,16 @@ static int cursorY = 0;
 #define COLOR_BLACK 0x000000
 #define COLOR_RED 0xFF0000
 
-// Buffer para double buffering
-// uint32_t backBuffer[SCREEN_WIDTH * SCREEN_HEIGHT];
+// Double buffer
+#define BUFFER_WIDTH 1920
+#define BUFFER_HEIGHT 1080
+
+static uint32_t backBuffer[BUFFER_WIDTH * BUFFER_HEIGHT];
+static int useDoubleBuffer = 1; // Flag para habilitar/deshabilitar double buffer
 
 uint32_t color = COLOR_WHITE;
 uint32_t backgroundColor = COLOR_BLACK;
-uint8_t zoom = 2; // 1;
+uint8_t zoom = 2;
 
 struct vbe_mode_info_structure
 {
@@ -54,16 +58,17 @@ struct vbe_mode_info_structure
     uint8_t reserved_mask;
     uint8_t reserved_position;
     uint8_t direct_color_attributes;
-
     uint32_t framebuffer; // physical address of the linear frame buffer; write here to draw to the screen
     uint32_t off_screen_mem_off;
     uint16_t off_screen_mem_size; // size of memory in the framebuffer but not being displayed on the screen
     uint8_t reserved1[206];
 } __attribute__((packed));
 
-typedef struct vbe_mode_info_structure *VBEInfoPtr;
 
+typedef struct vbe_mode_info_structure *VBEInfoPtr;
 VBEInfoPtr VBE_mode_info = (VBEInfoPtr)0x0000000000005C00;
+
+
 
 
 int getVbeInfo(neededInfo info){
@@ -75,18 +80,78 @@ int getVbeInfo(neededInfo info){
     info->height = VBE_mode_info->height;
     return 0;
 }
-void putPixel(uint32_t hexColor, uint64_t x, uint64_t y)
+
+static void putPixelBuffer(uint32_t hexColor, uint64_t x, uint64_t y)
+{
+    if (x >= 0 && x < BUFFER_WIDTH && y >= 0 && y < BUFFER_HEIGHT) {
+        backBuffer[y * BUFFER_WIDTH + x] = hexColor;
+    }
+}
+
+// Función para limpiar el back buffer
+void clearBackBuffer(uint32_t hexColor)
+{
+    for (int i = 0; i < BUFFER_WIDTH * BUFFER_HEIGHT; i++) {
+        backBuffer[i] = hexColor;
+    }
+}
+
+// Función para copiar el back buffer al front buffer (swap)
+void swapBuffers(void)
 {
     uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
-    uint64_t offset = (x * ((VBE_mode_info->bpp) / 8)) + (y * VBE_mode_info->pitch);
-    framebuffer[offset] = (hexColor) & 0xFF;
-    framebuffer[offset + 1] = (hexColor >> 8) & 0xFF;
-    framebuffer[offset + 2] = (hexColor >> 16) & 0xFF;
+    uint64_t screenWidth = VBE_mode_info->width;
+    uint64_t screenHeight = VBE_mode_info->height;
+    uint8_t bpp = VBE_mode_info->bpp / 8;
+    uint32_t pitch = VBE_mode_info->pitch;
+
+    // Copiar solo la parte visible del back buffer a la pantalla
+    for (uint64_t y = 0; y < screenHeight && y < BUFFER_HEIGHT; y++) {
+        for (uint64_t x = 0; x < screenWidth && x < BUFFER_WIDTH; x++) {
+            uint32_t pixel = backBuffer[y * BUFFER_WIDTH + x];
+            uint64_t offset = x * bpp + y * pitch;
+            
+            framebuffer[offset] = pixel & 0xFF;
+            framebuffer[offset + 1] = (pixel >> 8) & 0xFF;
+            framebuffer[offset + 2] = (pixel >> 16) & 0xFF;
+        }
+    }
 }
-// void vd_setFontColor(uint32_t hexColor)
-// {
-//     color = hexColor;
-// }
+
+void putPixel(uint32_t hexColor, uint64_t x, uint64_t y)
+{
+    if (useDoubleBuffer) {
+        putPixelBuffer(hexColor, x, y);
+    } else {
+        uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
+        uint64_t offset = (x * ((VBE_mode_info->bpp) / 8)) + (y * VBE_mode_info->pitch);
+        framebuffer[offset] = (hexColor) & 0xFF;
+        framebuffer[offset + 1] = (hexColor >> 8) & 0xFF;
+        framebuffer[offset + 2] = (hexColor >> 16) & 0xFF;
+    }
+}
+
+void vd_cleanScreen(void)
+{
+    if (useDoubleBuffer) {
+        clearBackBuffer(backgroundColor);
+    } else {
+        uint64_t width = VBE_mode_info->width;
+        uint64_t height = VBE_mode_info->height;
+
+        for (uint64_t y = 0; y < height; y++)
+        {
+            for (uint64_t x = 0; x < width; x++)
+            {
+                putPixel(backgroundColor, x, y);
+            }
+        }
+    }
+
+    // Reset cursor position
+    cursorX = 0;
+    cursorY = 0;
+}
 
 void vd_setFontColor(uint32_t hexColor)
 {
@@ -97,23 +162,30 @@ void vd_setFontColor(uint32_t hexColor)
 
 void replaceColor(uint32_t oldColor, uint32_t newColor)
 {
+    if (useDoubleBuffer) {
+        // Reemplazar en el back buffer
+        for (int i = 0; i < BUFFER_WIDTH * BUFFER_HEIGHT; i++) {
+            if (backBuffer[i] == oldColor) {
+                backBuffer[i] = newColor;
+            }
+        }
+    } else {
+        // Reemplazar directamente en framebuffer
+        uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
+        uint64_t width = VBE_mode_info->width;
+        uint64_t height = VBE_mode_info->height;
+        uint32_t pitch = VBE_mode_info->pitch;
+        uint8_t bpp = VBE_mode_info->bpp / 8;
 
-
-
-    uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
-    uint64_t width = VBE_mode_info->width;
-    uint64_t height = VBE_mode_info->height;
-    uint32_t pitch = VBE_mode_info->pitch;
-    uint8_t bpp = VBE_mode_info->bpp / 8;
-
-    for (uint64_t y = 0; y < height; y++) {
-        for (uint64_t x = 0; x < width; x++) {
-            uint64_t offset = x * bpp + y * pitch;
-            uint32_t pixel = framebuffer[offset] | (framebuffer[offset+1] << 8) | (framebuffer[offset+2] << 16);
-            if (pixel == oldColor) {
-                framebuffer[offset]     = (newColor) & 0xFF;
-                framebuffer[offset + 1] = (newColor >> 8) & 0xFF;
-                framebuffer[offset + 2] = (newColor >> 16) & 0xFF;
+        for (uint64_t y = 0; y < height; y++) {
+            for (uint64_t x = 0; x < width; x++) {
+                uint64_t offset = x * bpp + y * pitch;
+                uint32_t pixel = framebuffer[offset] | (framebuffer[offset+1] << 8) | (framebuffer[offset+2] << 16);
+                if (pixel == oldColor) {
+                    framebuffer[offset]     = (newColor) & 0xFF;
+                    framebuffer[offset + 1] = (newColor >> 8) & 0xFF;
+                    framebuffer[offset + 2] = (newColor >> 16) & 0xFF;
+                }
             }
         }
     }
@@ -125,8 +197,6 @@ void vd_setCursor(int x, int y)
     cursorY = CHAR_HEIGHT * y * zoom;
 }
 
-
-
 void vd_setZoom(int new_zoom)
 {
     zoom = new_zoom;
@@ -137,23 +207,6 @@ void vd_SetBackgroundColor(uint32_t hexColor)
     backgroundColor = hexColor;
 }
 
-void vd_cleanScreen(void)
-{
-    uint64_t width = VBE_mode_info->width;
-    uint64_t height = VBE_mode_info->height;
-
-    for (uint64_t y = 0; y < height; y++)
-    {
-        for (uint64_t x = 0; x < width; x++)
-        {
-            putPixel(backgroundColor, x, y);
-        }
-    }
-
-    // Reset cursor position
-    cursorX = 0;
-    cursorY = 0;
-}
 
 void vd_printstr(FDS fd, const char *buf, size_t count)
 {
@@ -234,17 +287,6 @@ void drawChar(unsigned char c, int x, int y, int fgcolor, int bgcolor, int mult)
     }
 }
 
-void drawRectangle(Point *topLeft, Point *downRigth, uint32_t c)
-{
-    for (int i = topLeft->x; i < downRigth->x; i++)
-    {
-        for (int j = topLeft->y; j < downRigth->y; j++)
-        {
-            putPixel(c, i, j);
-        }
-    }
-}
-
 
 
 void drawCircle(int center_x, int center_y, int radius, uint32_t color) {
@@ -274,43 +316,51 @@ void drawCircle(int center_x, int center_y, int radius, uint32_t color) {
 
 void scroll_screen(void)
 {
-    uint8_t *fb = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
-    uint32_t pitch = VBE_mode_info->pitch;
-    uint32_t h = VBE_mode_info->height;
-    uint32_t lines = CHAR_HEIGHT * zoom;
-    uint64_t move_bytes = (uint64_t)(h - lines) * pitch;
-
-    // 1) slide every scanline up by “lines”
-    memcpy(fb, fb + (uint64_t)lines * pitch, move_bytes);
-
-    // 2) clear the new bottom “lines” of pixels
-    memset(fb + move_bytes, 0, (uint64_t)lines * pitch);
+    if (useDoubleBuffer) {
+        // Scroll en el back buffer
+        uint32_t lines = CHAR_HEIGHT * zoom;
+        uint32_t bytesToMove = (BUFFER_HEIGHT - lines) * BUFFER_WIDTH * sizeof(uint32_t);
+        
+        // Mover líneas hacia arriba
+        for (uint32_t y = 0; y < BUFFER_HEIGHT - lines; y++) {
+            for (uint32_t x = 0; x < BUFFER_WIDTH; x++) {
+                backBuffer[y * BUFFER_WIDTH + x] = backBuffer[(y + lines) * BUFFER_WIDTH + x];
+            }
+        }
+        
+        // Limpiar las líneas de abajo
+        for (uint32_t y = BUFFER_HEIGHT - lines; y < BUFFER_HEIGHT; y++) {
+            for (uint32_t x = 0; x < BUFFER_WIDTH; x++) {
+                backBuffer[y * BUFFER_WIDTH + x] = backgroundColor;
+            }
+        }
+    } else {
+        // Scroll directo en framebuffer
+        uint8_t *fb = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
+        uint32_t pitch = VBE_mode_info->pitch;
+        uint32_t h = VBE_mode_info->height;
+        uint32_t lines = CHAR_HEIGHT * zoom;
+        
+        // Mover líneas hacia arriba
+        for (uint32_t y = 0; y < h - lines; y++) {
+            for (uint32_t x = 0; x < VBE_mode_info->width; x++) {
+                uint64_t src_offset = (x * 3) + ((y + lines) * pitch);
+                uint64_t dst_offset = (x * 3) + (y * pitch);
+                
+                fb[dst_offset] = fb[src_offset];
+                fb[dst_offset + 1] = fb[src_offset + 1];
+                fb[dst_offset + 2] = fb[src_offset + 2];
+            }
+        }
+        
+        // Limpiar las líneas de abajo
+        for (uint32_t y = h - lines; y < h; y++) {
+            for (uint32_t x = 0; x < VBE_mode_info->width; x++) {
+                putPixel(backgroundColor, x, y);
+            }
+        }
+    }
 }
 
-// void putPixelBackBuffer(uint32_t hexColor, uint64_t x, uint64_t y) {
-//     if (x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT) return;
-//     backBuffer[y * SCREEN_WIDTH + x] = hexColor;
-// }
 
-// void clearBackBuffer(uint32_t colorFondo) {
-//     // Rellena cada posición del array con “colorFondo”
-//     uint64_t total = (uint64_t)SCREEN_WIDTH * SCREEN_HEIGHT;
-//     for (uint64_t i = 0; i < total; i++) {
-//         backBuffer[i] = colorFondo;
-//     }
-// }
-
-// void swapBuffersToVideo(void) {
-//     // La dirección física de la VRAM lineal viene de VBE_mode_info->framebuffer
-//     uint8_t *framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
-//     // Cada píxel en VRAM usa 3 bytes (RGB). Aquí asumimos bpp = 32 bits (4 bytes) o 24 bits (3 bytes).
-//     // Si tu modo es 32 bits (RGBA o XRGB), copia 4 bytes por píxel:
-//     uint64_t totalPixels = (uint64_t)SCREEN_WIDTH * SCREEN_HEIGHT;
-//     uint32_t *videoPtr = (uint32_t *)framebuffer;
-//     for (uint64_t i = 0; i < totalPixels; i++) {
-//         videoPtr[i] = backBuffer[i];
-//     }
-//     // Si tu modo fuera 24 bpp, habría que copiar 3 bytes por píxel, ajustando el pitch. 
-//     // Pero en la mayoría de modos VBE 32 bpp actual, cada píxel es un uint32_t.
-// }
 

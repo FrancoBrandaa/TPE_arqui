@@ -21,7 +21,7 @@ int runCommand(const char *input)
         print(" - zoom\n");
         print(" - div0 (causa una division por cero)\n");
         print(" - invop (causa una operacion invalida)\n");
-        print(" - pongis golf\n");
+        print(" - pongis golf OR pg\n");
         print(" - color <color>\n");
         print(" - registers (muestra los registros del procesador)\n");
         return 1;
@@ -30,7 +30,7 @@ int runCommand(const char *input)
     if (strcmp(input, "clear") == 0)
     {
         cleanScreen();
-        print("Los monos TPE!\n");
+        print("Los Monos TPE!\n");
         return 2;
     }
 
@@ -57,7 +57,7 @@ int runCommand(const char *input)
         _ioe();
     }
 
-    if (strcmp(input, "pg") == 0)
+    if (strcmp(input, "pg") == 0 || strcmp(input, "pongis golf") == 0)
     {
         startPongis();
         return 5;

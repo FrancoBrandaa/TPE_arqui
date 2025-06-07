@@ -38,6 +38,8 @@ typedef struct{
     uint32_t color;
 }Object;
 
+void updateObject(Object *b);
+void updatePlayer(Object *b);
 void drawBall(Object *b);
 void applyFriction(Object* b, float deceleration);
 int get_sin(int angle);
@@ -49,13 +51,9 @@ float radiusByLevel(int level);
 
 void applyControlsPlayer2(Object *b);
 
-//float radiusByLevel(int level);
-
 // Top-down Poro sprite, resized from (1024, 1024) to 32×32 pixels
 // Transparent pixels use the magic color 0xFF00FF
 
-
-#include <stdint.h>
 
 static const uint32_t poro_sprite[32 * 32] = {
     0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 

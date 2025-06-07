@@ -17,5 +17,5 @@ int ticks_count();
 int seconds_count();
 dateStruct * get_time (); 
 void sleep(int microseconds);
-
+void sleepSeconds(int seconds);
 #endif

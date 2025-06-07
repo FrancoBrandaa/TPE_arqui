@@ -223,6 +223,7 @@ void setZoom(int new_zoom);
 
 int strncmp(const char* s1, const char* s2, size_t n);
 
+void swapBuffers(void);
 
 /**
  * @brief Copies up to n characters from source to destination.

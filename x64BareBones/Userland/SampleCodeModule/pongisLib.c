@@ -213,14 +213,14 @@ void applyFriction(Object *b, float deceleration)
     b->dy = b->speed * fy;
 }
 
-void updateObject(Object *b, int screenWidth, int screenHeight)
+void updateObject(Object *b)
 {
     // 1) Calculamos la posición que tendría la bola en el próximo frame
     float nextX = b->x + b->dx;
     float nextY = b->y + b->dy;
     float r = b->radius;
-    float w = (float)screenWidth;
-    float h = (float)screenHeight;
+    float w = (float)DIM_X;
+    float h = (float)DIM_Y;
 
     // 2) Comprobamos rebote en el eje X
     if (nextX - r < 0.0f) {
@@ -304,12 +304,12 @@ void updateObject(Object *b, int screenWidth, int screenHeight)
     }
 }
 
-void updatePlayer(Object *b, int screenWidth, int screenHeight) {
+void updatePlayer(Object *b) {
     float nextX = b->x + b->dx;
     float nextY = b->y + b->dy;
     float r     = b->radius;
-    float w     = (float)screenWidth;
-    float h     = (float)screenHeight;
+    float w     = (float)DIM_X;
+    float h     = (float)DIM_Y;
 
     // ———————————————————————
     // 1) EJE X: colisión vs paredes izquierda/derecha

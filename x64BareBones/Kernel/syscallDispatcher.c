@@ -6,18 +6,18 @@ extern uint64_t * getRegisters();
 #define SYSNUM_WRITE 1
 #define SYSNUM_GET_DATE 2
 #define SYSNUM_SHOW_REGISTERS 3
-#define SYSNUM_SET_CURSOR 5
-#define SYSNUM_DRAW_RECTANGLE 6
-#define SYSNUM_SET_FONT_COLOR 7
-#define SYSNUM_SET_BACKGROUND_FONT_COLOR 10
-#define SYSNUM_SET_ZOOM 13
-#define SYSNUM_SLEEP 32
-#define SYSNUM_CLEAN_SCREEN 30
-#define SYSNUM_PUT_PIXEL 19
-#define SYSNUM_PLAY_TONE 20
-#define SYSNUM_VBE_INFO 9
-#define SYSNUM_DRAW_CIRCLE 21
-#define SYSNUM_IS_KEY_PRESSED 23
+#define SYSNUM_SET_CURSOR 4
+#define SYSNUM_DRAW_CIRCLE 5
+#define SYSNUM_PUT_PIXEL 6
+#define SYSNUM_CLEAN_SCREEN 7
+#define SYSNUM_SET_FONT_COLOR 8
+#define SYSNUM_SET_BACKGROUND_FONT_COLOR 9
+#define SYSNUM_SET_ZOOM 10
+#define SYSNUM_SLEEP 11
+#define SYSNUM_PLAY_TONE 12
+#define SYSNUM_VBE_INFO 13
+#define SYSNUM_IS_KEY_PRESSED 14
+#define SYSNUM_SWAP_BUFFERS 15
 
 
 void sys_write(FDS fd, const char *buf, size_t count) 
@@ -70,12 +70,6 @@ void syscallDispatcher(uint64_t rax, ...) {
     }  else if (rax == SYSNUM_SET_BACKGROUND_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
         vd_SetBackgroundColor(hexColor);
-    }else if(rax == SYSNUM_DRAW_RECTANGLE){
-        Point* x = va_arg(args, Point*);
-        Point* y = va_arg(args, Point*);
-        uint32_t hexColor = va_arg(args, uint32_t);
-        drawRectangle(x, y, hexColor); //llamo directo a la fun del driver
-        ret = 0;
     }else if(rax == SYSNUM_GET_DATE){
         ret = get_time();
     }else if (rax == SYSNUM_SLEEP) {
@@ -117,22 +111,10 @@ void syscallDispatcher(uint64_t rax, ...) {
         int keyCode = (int)va_arg(args, uint64_t);
         // Llamamos a la función de teclado que definimos en keyboardDriver.c
         ret = (uint64_t) isKeyPressed(keyCode);
+    } else if (rax == SYSNUM_SWAP_BUFFERS) {
+        swapBuffers();
+        ret = 0;
     }
-     
-     
-      //else if (rax == SYSNUM_SPECIAL_KEYS) {
-    //     // Ahora la syscall recibe:
-    //     //    1) keyCode (int)  → código ASCII (0..127)
-    //     // Retorna 0 (liberada) o 1 (presionada)
-
-    //     int keyCode = (int) va_arg(args, uint64_t);
-
-    //     if (keyCode >= 0 && keyCode < MAX_KEY_CODES) {
-    //         ret = (uint64_t) keyStates[keyCode];
-    //     } else {
-    //         ret = 0;  // Si el keyCode está fuera de rango, devolvemos "liberada"
-    //     }
-    // }
     va_end(args);
     return ret;
 }

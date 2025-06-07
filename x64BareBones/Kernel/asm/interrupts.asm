@@ -21,7 +21,7 @@ GLOBAL _exception6Handler
 GLOBAL _int80Handler
 
 EXTERN getStackBase  ;esta en el kernel con su explicacion
-EXTERN showRegisters  ;buscarla noc donde esta
+EXTERN showRegisters  
 EXTERN irqDispatcher
 EXTERN syscallDispatcher
 EXTERN exceptionDispatcher
@@ -241,7 +241,7 @@ setEscFlag:
     ret
 
 section .rodata
-    userland equ 0x400000
+    userland equ 0xa00000
     registers_saved db 0
 
 section .bss
