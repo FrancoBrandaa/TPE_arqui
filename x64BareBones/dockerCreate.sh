@@ -1,5 +1,6 @@
 # Run this script only the fist time then it's unnecessary
 sudo docker pull agodio/itba-so:2.0
 sudo docker run -d -v ${PWD}:/root --security-opt seccomp:unconfined -it --name TPE-Arqui agodio/itba-so:2.0
-
+sudo chmod 777 compile.sh
+sudo chmod 777 run.sh
 

@@ -4,6 +4,7 @@
         "random": "c",
         "limits": "c",
         "stdlib.h": "c",
-        "libc.h": "c"
+        "libc.h": "c",
+        "videodriver.h": "c"
     }
 }

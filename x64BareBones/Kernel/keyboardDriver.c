@@ -1,11 +1,7 @@
 // keyboardDriver.c
 
 #include <keyboardDriver.h>
-#include <videoDriver.h>
 
-#define NOT_KEY       -2
-#define BUFFER_SIZE   256
-#define KEY_ESC       27
 
 // Estado de Shift (0 = liberado; 1 = presionado)
 static int isShiftPressed = 0;
@@ -44,17 +40,6 @@ char shift_ascii[128] = {
 // Declaración externa que devuelve el scancode actual desde la interrupción
 extern unsigned char returnKey();
 
-
-/**
- * @brief  Rutina de interrupción para el teclado.
- *         - Detecta Shift (presionado/liberado).
- *         - Detecta ESC (solo encolando el ASCII 27 en press).
- *         - Detecta press/release de teclas ASCII estándar:
- *           — En press: marca keyStates[ascii] = 1 y encola el ASCII en el buffer.
- *           — En release: marca keyStates[ascii] = 0.
- *
- *         NO se procesa nada de flechas en esta versión.
- */
 void keyboard_handler() {
     unsigned char scancode = returnKey();
 
@@ -115,19 +100,10 @@ void keyboard_handler() {
     }
 }
 
-
-/**
- * @brief  Comprueba si hay alguna tecla en el buffer (no bloqueante).
- * @return 1 si hay al menos una tecla en el buffer, 0 si está vacío.
- */
 char hasNextKey() {
     return (bufferHead != bufferTail);
 }
 
-/**
- * @brief  Saca el siguiente valor del buffer (ASCII o ESC).
- * @return Código ASCII (o 27 para Escape). Si el buffer está vacío, devuelve NOT_KEY (-2).
- */
 int nextKey() {
     if (!hasNextKey()) {
 
@@ -150,12 +126,6 @@ char getChar() {
     return (char)c;
 }
 
-/**
- * @brief  Función pública que devuelve 1 si la tecla ASCII keyCode está presionada,
- *         0 si está liberada o si keyCode está fuera de rango [0..127].
- * @param  keyCode Código ASCII de la tecla a consultar.
- * @return 1 (presionada) o 0 (liberada/o fuera de rango).
- */
 int isKeyPressed(int keyCode) {
     if (keyCode < 0 || keyCode >= 128) {
         return 0; 

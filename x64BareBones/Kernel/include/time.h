@@ -3,16 +3,13 @@
 
 #include <date.h>
 
-/**
- * @brief Structure representing date and time information.
- */
 typedef struct dateStruct {
-    char sec;    /**< Seconds (0-59) */
-    char min;    /**< Minutes (0-59) */
-    char hour;   /**< Hours (0-23) */
-    char day;    /**< Day of month (1-31) */
-    char month;  /**< Month (1-12) */
-    char year;   /**< Year (last two digits) */
+    char sec;
+    char min;
+    char hour;
+    char day;
+    char month;
+    char year;
 } dateStruct;
 
 /**
