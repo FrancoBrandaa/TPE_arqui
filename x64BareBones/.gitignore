@@ -9,5 +9,4 @@
 
 #Object files
 *.o
-compile.sh
 .bash_history

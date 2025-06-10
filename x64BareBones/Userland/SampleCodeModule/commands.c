@@ -16,7 +16,7 @@ int runCommand(const char *input)
         print(" - invop (causa una operacion invalida)\n");
         print(" - pongis golf OR pg\n");
         print(" - color <color>\n");
-        print(" - registers (muestra los registros del procesador)\n");
+        print(" - registers\n");
         return 1;
     }
 
