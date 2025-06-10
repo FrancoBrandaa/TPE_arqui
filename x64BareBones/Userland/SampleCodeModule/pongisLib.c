@@ -358,18 +358,6 @@ void drawPoroRotated_LUT(int centerX, int centerY, int scale, int angleDeg) {
     angleDeg %= 360;
     if (angleDeg < 0) angleDeg += 360;
 
-    // Si el Poro en la matriz original está “de costado” por defecto,
-    // podemos ajustar angleDeg con un offset. Por ejemplo, si el sprite
-    // sin rotar aparece mirando hacia la derecha y quieres que 0° sea “arriba”,
-    // usa angleDeg += 90; (o -= 90; según tu caso).
-    //
-    // Por ejemplo:
-    //    angleDeg = (angleDeg + 90) % 360;
-    //
-    // Descomenta la línea anterior solo si efectivamente tu Poro original
-    // está “girado 90°”.
-    //
-    // angleDeg = (angleDeg + 90) % 360;
 
     int s = get_sin(angleDeg); // Q15
     int c = get_cos(angleDeg); // Q15
@@ -525,7 +513,7 @@ printPoroMenu(void)
 {
     int scale = 10; // Cambia este valor para agrandar/reducir el sprite
     int sprite_size = 32;
-    int offset_x = 650;
+    int offset_x = 600;
     int offset_y = 100;
 
     for (int y = 0; y < sprite_size; y++)

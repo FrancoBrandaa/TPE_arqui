@@ -128,7 +128,6 @@ SECTION .text
     mov byte [registers_saved], 1   ; seteo flag de que se guardaron registros [ESTO ESTABA MAL]
 %endmacro
 
-
 %macro exceptionHandler 1
     catchRegisters
 

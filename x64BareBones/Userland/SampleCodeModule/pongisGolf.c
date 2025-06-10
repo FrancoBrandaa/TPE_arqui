@@ -152,7 +152,7 @@ void win(int numPlayers, int winner)
     }
 
     setZoom(3);
-    (current_level < 3) ? print("    Enter para jugar el siguiente nivel\n") : print("Has completado el juego!\n");
+    (current_level < 3) ? print("    Enter para jugar el siguiente nivel\n") : print("          Has completado el juego!\n");
     print("\n              Q para salir\n");
 
     swapBuffers();
@@ -240,6 +240,9 @@ void startGame(int numPlayers)
     srand_from_time();
     cleanScreen();
 
+    double x_hole = 100 + rand() % (1024 - 200);
+    double y_hole = 100 + rand() % (768 - 200);
+
     // Resetear contadores de colisiones al inicio del juego
     player1_collisions = 0;
     player2_collisions = 0;
@@ -275,8 +278,8 @@ void startGame(int numPlayers)
         .color = red};
 
     Object hole = {
-        .x = 100 + rand() % (1024 - 200),
-        .y = 100 + rand() % (768 - 200),
+        .x = x_hole,
+        .y = y_hole,
         .dx = 0.0f,
         .dy = 0.0f,
         .speed = 0.0f,
@@ -284,21 +287,22 @@ void startGame(int numPlayers)
         .radius = radiusByDifficulty[difficult],
         .color = black};
 
-    // Robot que se mueve al azar
+    // Robot que orbita alrededor del hoyo
+    float orbitRadius = hole.radius + 80.0f; // Radio de órbita alrededor del hoyo
     Object robot = {
-        .x = 300.0f + rand() % 400,
-        .y = 300.0f + rand() % 300,
+        .x = x_hole + orbitRadius, // Posición inicial en la órbita
+        .y = y_hole,
         .dx = 0.0f,
         .dy = 0.0f,
-        .speed = 2.0f, // Velocidad constante del robot
-        .angle = rand() % 360,
-        .radius = 35.0f,    // Más grande que los jugadores
-        .color = darkGrey}; // Color gris oscuro
+        .speed = 2.0f, // Velocidad angular del robot
+        .angle = 0.0f, // Ángulo orbital inicial
+        .radius = 35.0f,
+        .color = darkGrey};
 
     float threshold = hole.radius - 0.6f * ball.radius;
     float threshold2 = threshold * threshold;
 
-    int robotChangeTimer = 0; // Timer para cambiar dirección del robot
+    float robotOrbitAngle = 0.0f; // Ángulo para la órbita del robot
 
     while (1)
     {
@@ -330,19 +334,17 @@ void startGame(int numPlayers)
             }
         }
 
-        // Actualizar movimiento del robot
-        robotChangeTimer++;
-        if (robotChangeTimer >= 100)
-        { // Cambiar dirección cada ~1 segundo
-            robot.angle = rand() % 360;
-            robotChangeTimer = 0;
-        }
+        // Actualizar movimiento orbital del robot
+        robotOrbitAngle += robot.speed; // Incrementar ángulo orbital
+        if (robotOrbitAngle >= 360.0f)
+            robotOrbitAngle -= 360.0f;
 
-        // Mover el robot
-        float fx_robot = (float)get_cos(robot.angle) / (1 << FIXED_SHIFT);
-        float fy_robot = (float)get_sin(robot.angle) / (1 << FIXED_SHIFT);
-        robot.dx = robot.speed * fx_robot;
-        robot.dy = robot.speed * fy_robot;
+        // Calcular nueva posición del robot en órbita circular
+        float fx_orbit = (float)get_cos((int)robotOrbitAngle) / (1 << FIXED_SHIFT);
+        float fy_orbit = (float)get_sin((int)robotOrbitAngle) / (1 << FIXED_SHIFT);
+        
+        robot.x = x_hole + orbitRadius * fx_orbit;
+        robot.y = y_hole + orbitRadius * fy_orbit;
 
         updateObject(&robot);
 
