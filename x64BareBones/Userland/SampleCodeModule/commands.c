@@ -7,7 +7,6 @@ void printString(const char *str);
 int strncmp(const char *s1, const char *s2, size_t n);
 
 
-
 int runCommand(const char *input)
 {
 
@@ -50,23 +49,25 @@ int runCommand(const char *input)
     if (strcmp(input, "div0") == 0)
     {
         _div();
+        return 5;
     }
 
     if (strcmp(input, "invop") == 0)
     {
         _ioe();
+        return 6;
     }
 
     if (strcmp(input, "pg") == 0 || strcmp(input, "pongis golf") == 0)
     {
         startPongis();
-        return 5;
+        return 7;
     }
 
     if (strcmp(input, "registers") == 0)
     {
         printRegisters();
-        return 6;
+        return 8;
     }
 
     if (strncmp(input, "zoom ", 5) == 0)
@@ -82,7 +83,7 @@ int runCommand(const char *input)
             print("Zoom set to ");
             print(input + 5);
             print("\n");
-        return 7;
+        return 9;
     }
 
     
@@ -119,12 +120,12 @@ int runCommand(const char *input)
         else if (strcmp(colorName, "darkBrown") == 0) colorValue = darkBrown;
         else {
             print("Color no reconocido\n");
-            return 8;
+            return 10;
         }
 
         setFontColor(colorValue);
         print("Color cambiado!\n");
-        return 8;
+        return 10;
     }
 
     print("Comando no reconocido\n");

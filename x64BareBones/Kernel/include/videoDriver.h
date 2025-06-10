@@ -50,7 +50,7 @@ void putPixel(uint32_t hexColor, uint64_t x, uint64_t y);
 void drawChar(unsigned char c, int x, int y, int fgcolor, int bgcolor, int mult);
 
 
-void vd_putChar(char c, FDS fd);
+void putChar(char c, FDS fd);
 
 /**
  * @brief Draws a circle on the screen.
@@ -60,22 +60,16 @@ void vd_putChar(char c, FDS fd);
  * @param radius The radius of the circle.
  * @param color The color of the circle in hexadecimal format.
  */
-void drawCircle(int center_x, int center_y, int radius, uint32_t color);
-void vd_setCursor(int x, int y);
-void getCursorPos(int* x, int* y);
-void vd_cleanScreen(void);
-void vd_printstr(FDS fd, const char * buf, size_t count);
+void setCursor(int x, int y);
+void cleanScreen(void);
+void printStr(FDS fd, const char * buf, size_t count);
 void changeBackgroundColor(uint32_t hexColor);
-void vd_setZoom(int new_zoom);
+void setZoom(int new_zoom);
 void setFontColor(uint32_t hexColor);
-void scroll_screen(void);
-
-
-void vd_setCursor(int x, int y);
-void vd_setFontColor(uint32_t newColor);
-void vd_SetBackgroundColor(uint32_t newColor);
-
-
+void scrollScreen(void);
+void setCursor(int x, int y);
+void setFontColor(uint32_t newColor);
+void SetBackgroundColor(uint32_t newColor);
 // Double Buffering Functions
 void swapBuffers(void);
 void clearBackBuffer(uint32_t hexColor);

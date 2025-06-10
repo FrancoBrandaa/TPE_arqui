@@ -7,7 +7,6 @@ extern uint64_t * getRegisters();
 #define SYSNUM_GET_DATE 2
 #define SYSNUM_SHOW_REGISTERS 3
 #define SYSNUM_SET_CURSOR 4
-#define SYSNUM_DRAW_CIRCLE 5
 #define SYSNUM_PUT_PIXEL 6
 #define SYSNUM_CLEAN_SCREEN 7
 #define SYSNUM_SET_FONT_COLOR 8
@@ -20,10 +19,10 @@ extern uint64_t * getRegisters();
 #define SYSNUM_SWAP_BUFFERS 15
 
 
-void sys_write(FDS fd, const char *buf, size_t count) 
+void sysWrite(FDS fd, const char *buf, size_t count) 
 {
     if(fd == STDOUT || fd == STDERR) 
-        vd_printstr(fd, buf, count);
+        printStr(fd, buf, count);
     return;
 }
 
@@ -35,10 +34,10 @@ uint32_t readChars(char * buf, size_t count) {
         buf[i++] = (char) c;
         end = (c == -2);
     }
-    return i - end;             // si end es 1, resto un caracter (que seria el -2)
+    return i - end;         
 }
 
-size_t sys_read(FDS fd, char *buf, size_t count) {
+size_t sysRead(FDS fd, char *buf, size_t count) {
     if (fd == STDIN) {
         return readChars(buf, count);
     }
@@ -53,23 +52,23 @@ void syscallDispatcher(uint64_t rax, ...) {
        uint64_t fd = va_arg(args, uint64_t);
        uint64_t buf = va_arg(args, uint64_t);
         uint64_t count = va_arg(args, uint64_t);
-        ret = sys_read(fd, buf, count);
+        ret = sysRead(fd, buf, count);
     } else if (rax == SYSNUM_WRITE) {
         FDS fd = va_arg(args, FDS);
         const char * buf = va_arg(args, const char*);
         uint64_t count = va_arg(args, uint64_t);
-        sys_write(fd, buf, count);
+        sysWrite(fd, buf, count);
         ret = 0;
     } else if (rax == SYSNUM_SET_CURSOR) {
         int x = (int)va_arg(args, uint64_t);
         int y = (int)va_arg(args, uint64_t);
-        vd_setCursor(x, y);
+        setCursor(x, y);
     } else if (rax == SYSNUM_SET_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
-        vd_setFontColor(hexColor);
+        setFontColor(hexColor);
     }  else if (rax == SYSNUM_SET_BACKGROUND_FONT_COLOR) {
         uint32_t hexColor = va_arg(args, uint32_t);
-        vd_SetBackgroundColor(hexColor);
+        SetBackgroundColor(hexColor);
     }else if(rax == SYSNUM_GET_DATE){
         ret = get_time();
     }else if (rax == SYSNUM_SLEEP) {
@@ -81,10 +80,10 @@ void syscallDispatcher(uint64_t rax, ...) {
         ret = 0;
     }else if (rax == SYSNUM_SET_ZOOM) {
         int new_zoom = va_arg(args, int);
-        vd_setZoom(new_zoom);
+        setZoom(new_zoom);
         ret = 0;
     }else if (rax == SYSNUM_CLEAN_SCREEN) {
-        vd_cleanScreen();
+        cleanScreen();
         ret = 0;
     }else if(rax == SYSNUM_PUT_PIXEL){
         uint32_t hexColor = va_arg(args, uint32_t);
@@ -99,14 +98,7 @@ void syscallDispatcher(uint64_t rax, ...) {
     }else if(rax == SYSNUM_VBE_INFO){
         neededInfo x = va_arg(args, neededInfo); //puntero a structura
         ret = getVbeInfo(x); //cero si funca bien
-    }else if(rax == SYSNUM_DRAW_CIRCLE){
-        uint64_t x = va_arg(args, uint64_t);
-        uint64_t y = va_arg(args, uint64_t);
-        uint64_t radius = va_arg(args, uint64_t);
-        uint32_t hexColor = va_arg(args, uint32_t);
-        drawCircle(x, y, radius, hexColor);
-        ret = 0;
-    } else if (rax == SYSNUM_IS_KEY_PRESSED) {
+    }else if (rax == SYSNUM_IS_KEY_PRESSED) {
         // El usuario pasa un keyCode (ASCII 0..127) y devolvemos 1 si está presionado o 0 si no.
         int keyCode = (int)va_arg(args, uint64_t);
         // Llamamos a la función de teclado que definimos en keyboardDriver.c

@@ -106,7 +106,7 @@ void showRegisters() {
         strNCpy(strs[i], buf+1, 4);
         itoa(reg[i], buf+8, 16, 16);
         buf[24] = '\n';
-        sys_write(STDERR, buf, 25);
-		sys_write(STDERR, "\n", 1);
+        sysWrite(STDERR, buf, 25);
+		sysWrite(STDERR, "\n", 1);
     }
 }

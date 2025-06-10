@@ -11,14 +11,14 @@ void waitToReturn() {
     char c;
     do {
         _hlt();
-        sys_read(STDIN, &c, 1);
+        sysRead(STDIN, &c, 1);
     } while (c != '\n');
 }
 
 void exceptionDispatcher(int exception) {
 	if (exception == ZERO_EXCEPTION_ID)
     {
-        vd_printstr(STDERR, "EXCEPCION: Instruccion invalida detectada!\n", 44);
+        printStr(STDERR, "EXCEPCION: Instruccion invalida detectada!\n", 44);
 		zero_division();
     }
 	if (exception == INVALID_OPCODE)
@@ -38,10 +38,10 @@ static void invalid_opcode() {
 }
 
 void printError(char * msg){
-  vd_setCursor(0,0);
-  vd_cleanScreen(); 
-  sys_write(STDERR, msg, strLen(msg));
+  setCursor(0,0);
+  cleanScreen(); 
+  sysWrite(STDERR, msg, strLen(msg));
   showRegisters();
-  sys_write(STDERR, "\n\tPress enter to return to the shell\n", 36);
+  sysWrite(STDERR, "\n\tPress enter to return to the shell\n", 36);
   swapBuffers();
 }

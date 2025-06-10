@@ -109,7 +109,8 @@ void putPixel(uint32_t hexColor, uint64_t x, uint64_t y)
     }
 }
 
-void vd_cleanScreen(void)
+void cleanScreen
+(void)
 {
 
         for (int i = 0; i < BUFFER_WIDTH * BUFFER_HEIGHT; i++) {
@@ -121,7 +122,7 @@ void vd_cleanScreen(void)
     cursorY = 0;
 }
 
-void vd_setFontColor(uint32_t hexColor)
+void setFontColor(uint32_t hexColor)
 {
     uint32_t oldColor = color;
     color = hexColor;
@@ -138,29 +139,29 @@ void replaceColor(uint32_t oldColor, uint32_t newColor)
         }
 }
 
-void vd_setCursor(int x, int y)
+void setCursor(int x, int y)
 {
     cursorX = CHAR_WIDTH * x * zoom;
     cursorY = CHAR_HEIGHT * y * zoom;
 }
 
-void vd_setZoom(int new_zoom)
+void setZoom(int new_zoom)
 {
     zoom = new_zoom;
 }
 
-void vd_SetBackgroundColor(uint32_t hexColor)
+void SetBackgroundColor(uint32_t hexColor)
 {
     backgroundColor = hexColor;
 }
 
 
-void vd_printstr(FDS fd, const char *buf, size_t count)
+void printStr(FDS fd, const char *buf, size_t count)
 {
     int i = 0;
     while (i < count)
     {
-        vd_putChar(*buf++, fd);
+        putChar(*buf++, fd);
         i++;
     }
 }
@@ -176,7 +177,7 @@ static void putMultPixel(uint32_t hexColor, uint64_t x, uint64_t y, int mult)
     }
 }
 
-void vd_putChar(char c, FDS fd)
+void putChar(char c, FDS fd)
 {
 
     if (c == '\n')
@@ -214,7 +215,7 @@ void vd_putChar(char c, FDS fd)
     // check if cursorY exceeds screen height
     if (cursorY + CHAR_HEIGHT * zoom > VBE_mode_info->height)
     {
-        scroll_screen();
+        scrollScreen();
         cursorY -= CHAR_HEIGHT * zoom;
     }
 }
@@ -235,32 +236,9 @@ void drawChar(unsigned char c, int x, int y, int fgcolor, int bgcolor, int mult)
 
 
 
-void drawCircle(int center_x, int center_y, int radius, uint32_t color) {
-// Boundary check
-    if (center_x + radius < 0 || center_x - radius >= VBE_mode_info->width ||
-        center_y + radius < 0 || center_y - radius >= VBE_mode_info->height) {
-        return;
-    }
-
-    for (int y = -radius; y <= radius; y++) {
-        for (int x = -radius; x <= radius; x++) {
-            // Check if point is inside circle using distance formula
-            if (x * x + y * y <= radius * radius) {
-                int px = center_x + x;
-                int py = center_y + y;
-                
-                // Bounds checking
-                if (px >= 0 && px < VBE_mode_info->width && 
-                    py >= 0 && py < VBE_mode_info->height) {
-                    putPixel(color, px, py);
-                }
-            }
-        }
-    }
-}
 
 
-void scroll_screen(void)
+void scrollScreen(void)
 {
         // Scroll en el back buffer
         uint32_t lines = CHAR_HEIGHT * zoom;

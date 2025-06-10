@@ -14,10 +14,10 @@
 
 uint64_t sysCallDispatcher(uint64_t rax, ...);
 void setFontColor(uint32_t hexColor);
-void sys_write(FDS fd, const char *buf, size_t count);
+void sysWrite(FDS fd, const char *buf, size_t count);
 uint32_t readChars(char *buf, size_t count);
-size_t sys_read(FDS fd, char *buf, size_t count);
-void sys_setZoom(int new_zoom);
+size_t sysRead(FDS fd, char *buf, size_t count);
+void setZoom(int new_zoom);
 void swapBuffers(void);
 
 #endif

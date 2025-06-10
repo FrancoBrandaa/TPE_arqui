@@ -10,7 +10,7 @@ static int player2_collisions = 0;
 
 static int MaxColitionsByLevel[4] =
     {
-        // Máximo de colisiones por nivel
+        // Maximo de colisiones por nivel
         0,  // Nivel 0 (no existe, solo para facilitar el acceso)
         20, // Nivel 1
         15, // Nivel 2
@@ -20,9 +20,9 @@ static int MaxColitionsByLevel[4] =
 static double radiusByDifficulty[3] =
     {
         // Radios por dificultad
-        50.0, // Fácil
+        50.0, // Facil
         40.0, // Normal
-        30.0  // Difícil
+        30.0  // Dificil
 };
 
 static const char *options[] =
@@ -111,6 +111,7 @@ void startPongis()
                 startGame(1);
                 break;
             case 1:
+                current_level = 1;
                 startGame(2);
                 break;
             case 2:
@@ -318,7 +319,7 @@ void startGame(int numPlayers)
 
         cleanScreen();
 
-        // Verificar si algún jugador se quedó sin intentos
+        // Verificar si algun jugador se quedo sin intentos
         if (numPlayers == 1)
         {
             if (player1_collisions >= MaxColitionsByLevel[current_level])
@@ -360,7 +361,7 @@ void startGame(int numPlayers)
             }
         }
 
-        // Controles jugador 1 (solo si no se quedó sin intentos)
+        // Controles jugador 1 (solo si no se quedo sin intentos)
         if (player1_collisions < MaxColitionsByLevel[current_level])
         {
             applyControls(&player1);
@@ -372,7 +373,7 @@ void startGame(int numPlayers)
             }
         }
 
-        // Controles jugador 2 (solo si numPlayers == 2 y no se quedó sin intentos)
+        // Controles jugador 2 (solo si numPlayers == 2 y no se quedo sin intentos)
         if (numPlayers == 2 && player2_collisions < MaxColitionsByLevel[current_level])
         {
             applyControlsPlayer2(&player2);
@@ -424,7 +425,7 @@ void startGame(int numPlayers)
             ball.y = (float)(ry + offsetY);
         }
 
-        // Colisión robot con jugador 1
+        // Colision robot con jugador 1
         if (checkCollision(&robot, &player1))
         {
             // El robot empuja al jugador
@@ -452,7 +453,7 @@ void startGame(int numPlayers)
             player1.y = (float)(ry + offsetY);
         }
 
-        // Colisión robot con jugador 2 (si hay 2 jugadores)
+        // Colision robot con jugador 2 (si hay 2 jugadores)
         if (numPlayers == 2 && checkCollision(&robot, &player2))
         {
             // El robot empuja al jugador 2
@@ -480,7 +481,7 @@ void startGame(int numPlayers)
             player2.y = (float)(ry + offsetY);
         }
 
-        // Colisión con jugador 1 (solo si no se quedó sin intentos)
+        // Colision con jugador 1 (solo si no se quedo sin intentos)
         if (player1_collisions < MaxColitionsByLevel[current_level] && checkCollision(&player1, &ball))
         {
             player1_collisions++; // Incrementar contador de colisiones
@@ -519,7 +520,7 @@ void startGame(int numPlayers)
             ball.y = (float)(py + offsetY);
         }
 
-        // Colisión con jugador 2 (solo si numPlayers == 2 y no se quedó sin intentos)
+        // Colision con jugador 2 (solo si numPlayers == 2 y no se quedo sin intentos)
         if (numPlayers == 2 && player2_collisions < MaxColitionsByLevel[current_level] && checkCollision(&player2, &ball))
         {
             player2_collisions++; // Incrementar contador de colisiones
