@@ -1,4 +1,4 @@
-GLOBAL sys_call
+GLOBAL sysCall
 GLOBAL _div
 GLOBAL _ioe
 GLOBAL _hlt
@@ -6,7 +6,7 @@ GLOBAL _cli
 GLOBAL _sti
 GLOBAL _cliHlt
 
-sys_call:
+sysCall:
 
     mov rax, rdi
     mov rdi, rsi

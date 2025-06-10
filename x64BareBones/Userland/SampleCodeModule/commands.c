@@ -1,10 +1,4 @@
 #include <commands.h>
-#include <stdint.h>
-#include <libc.h>
-
-int strcmp(const char *s1, const char *s2);
-void printString(const char *str);
-int strncmp(const char *s1, const char *s2, size_t n);
 
 
 int runCommand(const char *input)
@@ -17,7 +11,7 @@ int runCommand(const char *input)
         print(" - clear\n");
         print(" - echo <mensaje>\n");
         print(" - date\n");
-        print(" - zoom\n");
+        print(" - zoom <numero>\n");
         print(" - div0 (causa una division por cero)\n");
         print(" - invop (causa una operacion invalida)\n");
         print(" - pongis golf OR pg\n");

@@ -72,8 +72,8 @@ void syscallDispatcher(uint64_t rax, ...) {
     }else if(rax == SYSNUM_GET_DATE){
         ret = get_time();
     }else if (rax == SYSNUM_SLEEP) {
-        int seconds = va_arg(args, int);
-        sleep(seconds);  
+        int microseconds = va_arg(args, int);
+        sleep(microseconds);  
     } else if (rax == SYSNUM_SHOW_REGISTERS) {
         uint64_t * regs = getRegisters();
         showRegisters(regs);

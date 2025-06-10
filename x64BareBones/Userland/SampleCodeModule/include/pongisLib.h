@@ -10,11 +10,6 @@
 #define QUAD_SIZE   91   // 0°–90° inclusive
 #define PI 3.141592653589793238462643383279502884197169399375105820974944592307816406286208998628034825342117067982148086513282306647
 
-int rand();
-void srand(unsigned int seed);
-void srand_from_time();
-
-
 static const int16_t sin_table_q[QUAD_SIZE] = 
 {
     0,    572,   1144,   1715,   2286,   2856,   3425,   3993,   4560,   5126,
@@ -29,7 +24,8 @@ static const int16_t sin_table_q[QUAD_SIZE] =
    32767
 };
 
-typedef struct{
+typedef struct
+{
     float x, y;       // posición actual
     float dx, dy; 
     float speed;      // módulo de la velocidad
@@ -38,22 +34,131 @@ typedef struct{
     uint32_t color;
 }Object;
 
+/**
+ * @brief Generates a pseudo-random number.
+ * 
+ * @return int A pseudo-random number between 0 and 32767.
+ */
+int rand();
+
+/**
+ * @brief Seeds the random number generator with a specific value.
+ * 
+ * @param seed The seed value to initialize the random number generator.
+ */
+void srand(unsigned int seed);
+
+/**
+ * @brief Seeds the random number generator using the current system time.
+ * 
+ * This function uses the current hour, minute, and second to create a seed
+ * for more varied random number generation.
+ */
+void srand_from_time();
+
+/**
+ * @brief Updates the position and handles collision detection for a game object.
+ * 
+ * This function moves the object according to its velocity (dx, dy) and handles
+ * bouncing off screen boundaries with proper angle calculations.
+ * 
+ * @param b Pointer to the Object to update.
+ */
 void updateObject(Object *b);
+
+/**
+ * @brief Updates the position of a player object with wall collision handling.
+ * 
+ * Unlike updateObject, this function stops the player at walls instead of bouncing,
+ * allowing sliding along walls when hitting them at an angle.
+ * 
+ * @param b Pointer to the player Object to update.
+ */
 void updatePlayer(Object *b);
+
+/**
+ * @brief Draws a circular ball object on the screen.
+ * 
+ * @param b Pointer to the Object representing the ball to draw.
+ */
 void drawBall(Object *b);
+
+/**
+ * @brief Draws a player character using a rotated sprite.
+ * 
+ * @param p Pointer to the Object representing the player.
+ * @param scale Scale factor for the sprite size.
+ * @param player Player number (1 or 2) to determine which sprite to use.
+ */
+void drawPlayer(const Object *p, int scale, int player);
+
+/**
+ * @brief Draws a rotated and scaled Poro sprite at the specified location.
+ * 
+ * @param centerX X coordinate of the sprite center.
+ * @param centerY Y coordinate of the sprite center.
+ * @param scale Scale factor for the sprite size.
+ * @param angleDeg Rotation angle in degrees.
+ * @param player Player number (1 or 2) to select the appropriate sprite.
+ */
+void drawPoroRotated(int centerX, int centerY, int scale, int angleDeg, int player);
+
+/**
+ * @brief Applies friction to slow down a moving object.
+ * 
+ * @param b Pointer to the Object to apply friction to.
+ * @param deceleration Amount of speed to reduce per frame.
+ */
 void applyFriction(Object* b, float deceleration);
+
+/**
+ * @brief Handles player input and applies movement controls to a player object.
+ * 
+ * @param b Pointer to the player Object to control.
+ * @param player Player number (1 or 2) to determine which keys to check.
+ */
+void applyControls(Object* b, int player);
+
+/**
+ * @brief Calculates the sine of an angle using a lookup table.
+ * 
+ * @param angle Angle in degrees.
+ * @return int Sine value in Q15 fixed-point format.
+ */
 int get_sin(int angle);
+
+/**
+ * @brief Calculates the cosine of an angle using a lookup table.
+ * 
+ * @param angle Angle in degrees.
+ * @return int Cosine value in Q15 fixed-point format.
+ */
 int get_cos(int angle);
-void applyControls(Object* b);
+
+/**
+ * @brief Calculates the integer square root of a number.
+ * 
+ * @param x The number to calculate the square root of.
+ * @return uint32_t The integer square root of x.
+ */
 uint32_t isqrt(uint32_t x);
 
-float radiusByLevel(int level);
+/**
+ * @brief Checks if two circular objects are colliding.
+ * 
+ * @param a Pointer to the first Object.
+ * @param b Pointer to the second Object.
+ * @return int 1 if the objects are colliding, 0 otherwise.
+ */
+int checkCollision(Object *a, Object *b);
 
-void applyControlsPlayer2(Object *b);
-
-// Top-down Poro sprite, resized from (1024, 1024) to 32×32 pixels
-// Transparent pixels use the magic color 0xFF00FF
-
+/**
+ * @brief Draws the Poro menu sprite on the screen.
+ * 
+ * This function renders a large Poro sprite used in the game menu
+ * at a fixed position and scale.
+ */
+void printPoroMenu(void);
 
 static const uint32_t poro_sprite[32 * 32] = {
     0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 
@@ -161,6 +266,5 @@ static const uint32_t poro_menu[1024] = {
     0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0x000000, 0x000000, 0x000000, 0x000000, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0x000000, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0x000000, 0x000000, 0x000000, 0x000000, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF,
     0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF, 0xFF00FF,
 };
-
 
 #endif // PORO_SPRITE_H

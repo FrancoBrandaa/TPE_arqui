@@ -1,12 +1,10 @@
 #include <stdint.h>
-#include <shell.h>
 #include "./include/libc.h"
 #include <libasm.h>
 #include <commands.h>
 
 static char exit = 0;
-static void initializeShell();
-   
+
 void shell()
 {
     initScreenSize(); 
@@ -37,7 +35,7 @@ void initializeShell()
                     print("\n");
 
                     // Execute the command
-                    int num_comando = runCommand(command);
+                    runCommand(command);
                     break;
                 }
                 else if (c == '\b' && index > 0) //se pasa del borrado 

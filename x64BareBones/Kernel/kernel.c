@@ -2,7 +2,6 @@
 #include <string.h>
 #include <lib.h>
 #include <moduleLoader.h>
-#include <naiveConsole.h>
 #include <idtLoader.h>
 #include <interrupts.h>
 #include <defs.h>
@@ -28,9 +27,6 @@ static void * const sampleDataModuleAddress = (void*)0x500000;
 
 typedef int (*EntryPoint)();
 
-//void print(char* message);
-//void vga_puts(const char* str);  
-
 void clearBSS(void * bssAddress, uint64_t bssSize)
 {
 	memset(bssAddress, 0, bssSize);
@@ -50,58 +46,18 @@ void * getStackBase()
 
 void * initializeKernelBinary()
 {
-	char buffer[10];
-
-	ncPrint("[x64BareBones]");
-	ncNewline();
-
-	ncPrint("CPU Vendor:");
-	ncPrint(cpuVendor(buffer));
-	ncNewline();
-
-	ncPrint("[Loading modules]");
-	ncNewline();
 	void * moduleAddresses[] = {
 		sampleCodeModuleAddress,
 		sampleDataModuleAddress
 	};
-
 	loadModules(&endOfKernelBinary, moduleAddresses);
-	ncPrint("[Done]");
-	ncNewline();
-	ncNewline();
-
-	ncPrint("[Initializing kernel's binary]");
-	ncNewline();
-
 	clearBSS(&bss, &endOfKernel - &bss);
-
-	ncPrint("  text: 0x");
-	ncPrintHex((uint64_t)&text);
-	ncNewline();
-	ncPrint("  rodata: 0x");
-	ncPrintHex((uint64_t)&rodata);
-	ncNewline();
-	ncPrint("  data: 0x");
-	ncPrintHex((uint64_t)&data);
-	ncNewline();
-	ncPrint("  bss: 0x");
-	ncPrintHex((uint64_t)&bss);
-	ncNewline();
-
-	ncPrint("[Done]");
-	ncNewline();
-	ncNewline();
 	return getStackBase();
 }
 
 int main()
 {	
-	
-	//Carga la Interrupt Descriptor Table (IDT)
 	load_idt(); //Manejo de interrupciones y syscalls
-	//playTone(200,4000); //para testing
-	//Realiza un salto al código de userland
 	((EntryPoint)sampleCodeModuleAddress)();
 	haltcpu();
 	return 0;	

@@ -1,10 +1,8 @@
 #include <time.h>
-#include <naiveConsole.h>
 #include <stdint.h>
 
-#define TIMEZONE_OFFSET_HOURS -3
-
 static unsigned long ticks = 0;
+static dateStruct date;
 
 //Cada vez que interrumpe cada 55mS entra aca y suma un tick
 void timer_handler() 
@@ -21,20 +19,16 @@ int seconds_count() {
 	return ticks / 18;
 }
 
-static dateStruct date;
-
 dateStruct * get_time () 
 {
     date.sec = get_secs();
     date.min = get_mins();
-    date.hour = get_hours() + TIMEZONE_OFFSET_HOURS; // Ajuste de huso horario
-
-    if (date.hour < 0) 
-        date.hour += 24; // Ajuste para horas negativas
+    date.hour = get_hours();
 
     date.day = get_day();
     date.month = get_month();
     date.year = get_year();
+    
     return &date;
 }
 

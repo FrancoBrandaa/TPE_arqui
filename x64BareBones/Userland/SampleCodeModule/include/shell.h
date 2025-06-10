@@ -1,19 +1,25 @@
-/***************************************************
-  shell.h
-****************************************************/
+#ifndef SHELL_H
+#define SHELL_H
 
-#ifndef _SHELL_H_
-#define _SHELL_H_
+#include <libc.h>
 
 /**
- * @brief Entry point for the shell program.
- *
- * This function initializes and starts the shell, providing an interface
- * for the user to interact with the system. It handles user input, executes
- * commands, and displays output.
+ * @brief Initializes and starts the main shell interface.
+ * 
+ * This function sets up the screen, displays the welcome message,
+ * and calls the main shell loop. It serves as the entry point
+ * for the shell system.
  */
-void shell();
+void shell(void);
 
+/**
+ * @brief Main shell loop that handles user input and command execution.
+ * 
+ * This function runs the interactive shell loop, displaying the prompt,
+ * reading user input character by character, handling backspace,
+ * and executing commands when Enter is pressed. It continues until
+ * the exit flag is set.
+ */
+void initializeShell(void);
 
-
-#endif
+#endif // SHELL_H

@@ -1,7 +1,6 @@
 // keyboardDriver.c
 
 #include <keyboardDriver.h>
-#include <naiveConsole.h>
 #include <videoDriver.h>
 
 #define NOT_KEY       -2
@@ -131,6 +130,7 @@ char hasNextKey() {
  */
 int nextKey() {
     if (!hasNextKey()) {
+
         return NOT_KEY;
     }
     int c = keyBuffer[bufferTail];
@@ -156,9 +156,9 @@ char getChar() {
  * @param  keyCode Código ASCII de la tecla a consultar.
  * @return 1 (presionada) o 0 (liberada/o fuera de rango).
  */
-char isKeyPressed(int keyCode) {
+int isKeyPressed(int keyCode) {
     if (keyCode < 0 || keyCode >= 128) {
-        return 0;
+        return 0; 
     }
     return keyStates[keyCode];
 }

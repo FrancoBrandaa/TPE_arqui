@@ -1,8 +1,44 @@
-#include <libc.h>
-#include <pongisLib.h>
-#define ANGLES 360
+#include <pongisGolf.h>
+
+// Configuración de niveles y dificultad
+#define MAX_LEVELS 3
+#define LEVEL_ARRAY_SIZE 4
+#define DIFFICULTY_LEVELS 3
+#define EASY_DIFFICULTY 0
+#define NORMAL_DIFFICULTY 1
+#define HARD_DIFFICULTY 2
+
+// Posiciones iniciales de objetos
+#define BALL_INITIAL_X 100.0f
+#define BALL_INITIAL_Y 100.0f
+#define PLAYER1_INITIAL_X 400.0f
+#define PLAYER1_INITIAL_Y 100.0f
+#define PLAYER2_INITIAL_X 600.0f
+#define PLAYER2_INITIAL_Y 200.0f
+
+// Radios de objetos
+#define BALL_RADIUS 20.0f
+#define PLAYER_RADIUS 20.0f
+#define ROBOT_RADIUS 35.0f
+
+// Configuración del robot orbital
+#define ROBOT_ORBIT_OFFSET 80.0f
+#define ROBOT_SPEED 2.0f
+
+// Configuración de física
+#define BALL_THRESHOLD_FACTOR 0.6f
+#define PLAYER_FRICTION 0.3f
+#define BALL_FRICTION 0.1f
+#define ROBOT_PUSH_SPEED 8.0f
+#define MIN_EXTRA_SPEED 5.0f
+#define SEPARATION_OFFSET 5.0f
+#define BALL_SEPARATION_OFFSET 1.0f
+
+// Configuración de tiempo
+#define FRAME_SLEEP_TIME 10
+
 static int current_level = 1;
-static int difficult = 1; // Dificultad inicial (0: Fácil, 1: Normal, 2: Difícil)
+static int difficult = NORMAL_DIFFICULTY; // Dificultad inicial (0: Fácil, 1: Normal, 2: Difícil)
 static int player1_collisions = 0;
 static int player2_collisions = 0;
 
@@ -12,9 +48,9 @@ static int MaxColitionsByLevel[4] =
     {
         // Maximo de colisiones por nivel
         0,  // Nivel 0 (no existe, solo para facilitar el acceso)
-        20, // Nivel 1
-        15, // Nivel 2
-        10  // Nivel 3
+        15, // Nivel 1
+        10, // Nivel 2
+        5  // Nivel 3
 };
 
 static double radiusByDifficulty[3] =
@@ -31,18 +67,20 @@ static const char *options[] =
         "Jugar (2 jugadores)",
         "dificultad",
         "Salir"};
+
 static const int nopt = sizeof(options) / sizeof(options[0]);
+
 
 // Función para obtener el nombre de la dificultad
 static const char *getDifficultyName()
 {
     switch (difficult)
     {
-    case 0:
+    case EASY_DIFFICULTY:
         return "Facil";
-    case 1:
+    case NORMAL_DIFFICULTY:
         return "Normal";
-    case 2:
+    case HARD_DIFFICULTY:
         return "Dificil";
     default:
         return "Normal";
@@ -88,8 +126,6 @@ void startPongis()
     while (1)
     {
         char c = getChar();
-        if (c == NOT_KEY)
-            continue;
 
         if (c == 'w')
         { // subir
@@ -177,7 +213,7 @@ void win(int numPlayers, int winner)
 }
 
 // Función para mostrar Game Over
-void Lose()
+void lose()
 {
     setBackGroundColor(black);
     cleanScreen();
@@ -241,41 +277,41 @@ void startGame(int numPlayers)
     srand_from_time();
     cleanScreen();
 
-    double x_hole = 100 + rand() % (1024 - 200);
-    double y_hole = 100 + rand() % (768 - 200);
+    double x_hole = 100 + rand() % (DIM_X - 200);
+    double y_hole = 100 + rand() % (DIM_Y - 200);
 
     // Resetear contadores de colisiones al inicio del juego
     player1_collisions = 0;
     player2_collisions = 0;
 
-    Object ball = {
-        .x = 100.0f,
-        .y = 100.0f,
+Object ball = {
+        .x = BALL_INITIAL_X,
+        .y = BALL_INITIAL_Y,
         .dx = 0.0f,
         .dy = 0.0f,
         .speed = 0.0f,
         .angle = 0.0f,
-        .radius = 20.0f,
+        .radius = BALL_RADIUS,
         .color = white};
 
     Object player1 = {
-        .x = 400.0f,
-        .y = 100.0f,
+        .x = PLAYER1_INITIAL_X,
+        .y = PLAYER1_INITIAL_Y,
         .dx = 0.0f,
         .dy = 0.0f,
         .speed = 0.0f,
         .angle = 0.0f,
-        .radius = 20.0f,
+        .radius = PLAYER_RADIUS,
         .color = blue};
 
     Object player2 = {
-        .x = 600.0f,
-        .y = 200.0f,
+        .x = PLAYER2_INITIAL_X,
+        .y = PLAYER2_INITIAL_Y,
         .dx = 0.0f,
         .dy = 0.0f,
         .speed = 0.0f,
         .angle = 0.0f,
-        .radius = 20.0f,
+        .radius = PLAYER_RADIUS,
         .color = red};
 
     Object hole = {
@@ -289,26 +325,27 @@ void startGame(int numPlayers)
         .color = black};
 
     // Robot que orbita alrededor del hoyo
-    float orbitRadius = hole.radius + 80.0f; // Radio de órbita alrededor del hoyo
+    float orbitRadius = hole.radius + ROBOT_ORBIT_OFFSET; // Radio de órbita alrededor del hoyo
     Object robot = {
         .x = x_hole + orbitRadius, // Posición inicial en la órbita
         .y = y_hole,
         .dx = 0.0f,
         .dy = 0.0f,
-        .speed = 2.0f, // Velocidad angular del robot
+        .speed = ROBOT_SPEED, // Velocidad angular del robot
         .angle = 0.0f, // Ángulo orbital inicial
-        .radius = 35.0f,
+        .radius = ROBOT_RADIUS,
         .color = darkGrey};
 
-    float threshold = hole.radius - 0.6f * ball.radius;
+    float threshold = hole.radius - BALL_THRESHOLD_FACTOR * ball.radius;
     float threshold2 = threshold * threshold;
 
     float robotOrbitAngle = 0.0f; // Ángulo para la órbita del robot
 
+
     while (1)
     {
         // ESC para volver al menú
-        if (isKeyPressed('q'))
+        if (getChar() == KEY_ESC)
         {
             player1_collisions = 0;
             player2_collisions = 0;
@@ -324,14 +361,14 @@ void startGame(int numPlayers)
         {
             if (player1_collisions >= MaxColitionsByLevel[current_level])
             {
-                Lose();
+                lose();
             }
         }
         else
         { // numPlayers == 2
             if (player1_collisions >= MaxColitionsByLevel[current_level] && player2_collisions >= MaxColitionsByLevel[current_level])
             {
-                Lose();
+                lose();
             }
         }
 
@@ -364,7 +401,7 @@ void startGame(int numPlayers)
         // Controles jugador 1 (solo si no se quedo sin intentos)
         if (player1_collisions < MaxColitionsByLevel[current_level])
         {
-            applyControls(&player1);
+            applyControls(&player1, 1);
             updatePlayer(&player1);
 
             if (!isKeyPressed('w'))
@@ -376,7 +413,7 @@ void startGame(int numPlayers)
         // Controles jugador 2 (solo si numPlayers == 2 y no se quedo sin intentos)
         if (numPlayers == 2 && player2_collisions < MaxColitionsByLevel[current_level])
         {
-            applyControlsPlayer2(&player2);
+            applyControls(&player2, 2);
             updatePlayer(&player2);
 
             if (!isKeyPressed('i'))
@@ -525,7 +562,8 @@ void startGame(int numPlayers)
         {
             player2_collisions++; // Incrementar contador de colisiones
 
-            ball.speed = player2.speed;
+            float minExtra = 5.0f;
+            ball.speed = player2.speed + minExtra;
             ball.angle = player2.angle;
 
             float fx = (float)get_cos(ball.angle) / (1 << FIXED_SHIFT);
@@ -592,18 +630,16 @@ void startGame(int numPlayers)
 
         // Dibujar todos los objetos
         drawBall(&robot); // Dibujar el robot
-        drawPlayer(&player1, 2);
+
+        drawPlayer(&player1, 2, 1);
         if (numPlayers == 2)
-        {
-            drawPlayer2(&player2, 2);
-        }
+            drawPlayer(&player2, 2, 2);
         drawBall(&ball);
 
         // Mostrar contador de colisiones
         drawCollisionCounter(numPlayers);
 
         swapBuffers();
-        
-        sleep(10);
+        sleep(FRAME_SLEEP_TIME);
     }
 }

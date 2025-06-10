@@ -6,15 +6,14 @@
 #define GET_DATE 2
 #define PRINT_REGISTERS 3
 #define SET_CURSOR 4
+#define PUT_PIXEL 6
+#define CLEAN_SCREEN 7
 #define SET_FONT_COLOR 8
 #define SET_BACKGROUND_FONT_COLOR 9
 #define SET_ZOOM 10
 #define SLEEP 11
-#define CLEAN_SCREEN 7
-#define PUT_PIXEL 6
 #define PLAY_TONE 12
 #define VBE_GET_INFO 13
-#define DRAW_CIRCLE 5
 #define IS_KEY_PRESSED 14
 #define SWAP_BUFFERS 15
 
@@ -23,7 +22,7 @@ uint16_t DIM_X = 0;
 uint16_t DIM_Y = 0;
 
 void swapBuffers(void) {
-    sys_call(SWAP_BUFFERS, 0, 0, 0, 0);
+    sysCall(SWAP_BUFFERS, 0, 0, 0, 0);
 }
 
 int initScreenSize(void) {
@@ -41,43 +40,40 @@ int initScreenSize(void) {
 }
 //le paso un puntero a la estructura a llenar y si me retorna 0 es que lo lleno correctamente
 int getVbeInfo(neededInfo info){
-    return sys_call(VBE_GET_INFO, info, 0, 0,0);
+    return  sysCall(VBE_GET_INFO, info, 0, 0,0);
 }
 
-int isKeyPressed (int keyCode) {
-    return sys_call(IS_KEY_PRESSED, keyCode, 0, 0, 0);
+int isKeyPressed (int keyCode) 
+{
+    return  sysCall(IS_KEY_PRESSED, keyCode, 0, 0, 0);
 }
 
-void drawCircle(int centerX, int centerY, int radius, uint32_t color){
-    sys_call(DRAW_CIRCLE, centerX, centerY, radius, color);
-}
 void playTone(uint64_t frequency,uint64_t duration_ms) {
-    sys_call(PLAY_TONE, frequency, duration_ms, 0,0 );
+    sysCall(PLAY_TONE, frequency, duration_ms, 0,0 );
 }
 void setFontColor(uint32_t hexColor)
 {
-    sys_call(SET_FONT_COLOR, hexColor, 0, 0,0);
+    sysCall(SET_FONT_COLOR, hexColor, 0, 0,0);
 }
 void setBackGroundColor(uint32_t hexColor)
 {
-    sys_call(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0,0);
+    sysCall(SET_BACKGROUND_FONT_COLOR, hexColor, 0, 0,0);
 }
 
 void putPixel(uint32_t color,uint64_t x, uint64_t y){
-    sys_call(PUT_PIXEL, color , x, y,0);
+    sysCall(PUT_PIXEL, color , x, y,0);
 }
 
-printRegisters()
+void printRegisters()
 {
-    sys_call(PRINT_REGISTERS, 0, 0, 0,0);
+    sysCall(PRINT_REGISTERS, 0, 0, 0,0);
 }
 
 dateStruct *getDate()
 {
-    dateStruct *date = sys_call(GET_DATE, 0, 0, 0,0);
+    dateStruct *date =  sysCall(GET_DATE, 0, 0, 0,0);
     return date;
 }
-
 
 void timeToStr(char *buffer)
 {
@@ -90,7 +86,7 @@ void timeToStr(char *buffer)
     strNCpy(aux, buffer + 3, 2);
     itoa(date->year, aux, 16, 2);
     strNCpy(aux, buffer + 6, 2);
-    itoa(date->hour, aux, 16, 2); // LA HORA ESTA CORRIDA 5 HORAS, VER COMO FIXEAR
+    itoa(date->hour, aux, 16, 2);
     strNCpy(aux, buffer + 9, 2);
     itoa(date->min, aux, 16, 2);
     strNCpy(aux, buffer + 12, 2);
@@ -110,20 +106,18 @@ void printDate()
 
 void nprint(const char *buf, uint64_t lenght)
 {
-    sys_call(WRITE, STDOUT, (uint64_t)buf, (uint64_t)lenght,0);
+    sysCall(WRITE, STDOUT, (uint64_t)buf, (uint64_t)lenght,0);
 }
 
-void sleep(uint64_t seconds)
+void sleep(uint64_t microSeconds)
 {
-    sys_call(SLEEP, seconds, 0,0,0);
+    sysCall(SLEEP, microSeconds, 0,0,0);
 }
 
 void print(const char *buf)
 {
     nprint(buf, strlen(buf));
 }
-
-
 
 void printInt(int value) {
     if (value == 0) {
@@ -147,7 +141,7 @@ void printInt(int value) {
 
 int scan(char *buf, uint32_t count)
 {
-    return sys_call((uint64_t)READ, (uint64_t)STDIN, (uint64_t)buf, (uint64_t)count,0);
+    return  sysCall((uint64_t)READ, (uint64_t)STDIN, (uint64_t)buf, (uint64_t)count,0);
 }
 
 int itoa(uint64_t value, char *buffer, int base, int n)
@@ -205,25 +199,24 @@ int strlen(const char *str)
 {
     int len = 0;
     while (str[len] != '\0')
-    {
         len++;
-    }
+        
     return len;
 }
 
 void cleanScreen()
 {
-    sys_call(CLEAN_SCREEN, 0, 0, 0,0);
+    sysCall(CLEAN_SCREEN, 0, 0, 0,0);
 }
 
 void setCursor(uint32_t x, uint32_t y)
 {
-    sys_call(SET_CURSOR, x, y, 0,0);
+    sysCall(SET_CURSOR, x, y, 0,0);
 }
 
 void setZoom(int new_zoom)
 {
-    sys_call(SET_ZOOM, new_zoom, 0, 0,0);
+    sysCall(SET_ZOOM, new_zoom, 0, 0,0);
 }
 
 void setCharCursor(uint32_t x, uint32_t y)
@@ -238,9 +231,14 @@ void strCpy(const char *source, char *dest)
 
 char* strNCpy(const char * source, char * dest, int n)
 {
+    char* original_dest = dest; // Guardar el puntero original
+    
     while (n-- && (*dest++ = *source++));
+    
     if (n >= 0)
         *dest = '\0'; // Null-terminate if there's space
+        
+    return original_dest; // Devolver el puntero original al destino
 }
 
 int strcmp(const char *s1, const char *s2)
