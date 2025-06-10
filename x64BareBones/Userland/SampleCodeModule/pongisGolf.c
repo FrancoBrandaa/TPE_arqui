@@ -368,7 +368,7 @@ void startGame(int numPlayers)
 
             if (!isKeyPressed('w'))
             {
-                applyFriction(&player1, 0.08f);
+                applyFriction(&player1, 0.3f);
             }
         }
 
@@ -380,7 +380,7 @@ void startGame(int numPlayers)
 
             if (!isKeyPressed('i'))
             {
-                applyFriction(&player2, 0.08f);
+                applyFriction(&player2, 0.3f);
             }
         }
 
@@ -557,7 +557,7 @@ void startGame(int numPlayers)
             ball.y = (float)(py + offsetY);
         }
 
-        applyFriction(&ball, 0.08f);
+        applyFriction(&ball, 0.1f);
 
         float dx_h = ball.x - hole.x;
         float dy_h = ball.y - hole.y;
