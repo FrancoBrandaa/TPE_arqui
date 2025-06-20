@@ -18,18 +18,16 @@ void drawBall(Object *b)
     }
 }
 
-void drawPlayer(const Object *p, int scale, int player) {
-    // 1) Centramos la posición (convierte x,y float a int)
+void drawPlayer(const Object *p, int scale, int player) 
+{
     int cx = (int)(p->x);
     int cy = (int)(p->y);
 
-    // 2) Normalizamos el ángulo y opcionalmente aplicamos offset
     int angleDeg = (int)(p->angle) % 360;
 
     if (angleDeg < 0) angleDeg += 360;
         angleDeg = (angleDeg + 90) % 360;
 
-    // 3) Dibujamos el Poro rotado y escalado
     drawPoroRotated(cx, cy, scale, angleDeg, player);
 }
 
@@ -108,7 +106,7 @@ void applyFriction(Object *b, float deceleration)
         }
     }
 
-    // Recalcular componentes de velocidad en x e y según el ángulo
+    // Recalcular componentes de velocidad en x e y segun el angulo
     float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
     float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
     b->dx = b->speed * fx;
@@ -117,32 +115,30 @@ void applyFriction(Object *b, float deceleration)
 
 void updateObject(Object *b)
 {
-    // 1) Calculamos la posición que tendría la bola en el próximo frame
+    // Calculamos la posicion que tendria la bola en el proximo frame
     float nextX = b->x + b->dx;
     float nextY = b->y + b->dy;
     float r = b->radius;
     float w = (float)DIM_X;
     float h = (float)DIM_Y;
 
-    // 2) Comprobamos rebote en el eje X
+    // Comprobamos rebote en el eje X
     if (nextX - r < 0.0f) {
         // Choque contra pared izquierda
         float penetration = r - nextX;
-        // **Invertir dx**:
+        
         b->dx = -b->dx;
-        // **Calcular nuevo ángulo** (rebote horizontal)
-        //  angle_new = 180° - angle_old
+        
         b->angle = 180.0f - b->angle;
         if (b->angle < 0.0f) b->angle += 360.0f;
         if (b->angle >= 360.0f) b->angle -= 360.0f;
-        // **Recalcular dx/dy a partir de angle y speed**:
         {
             float fx = (float)get_cos(b->angle) / (1 << FIXED_SHIFT);
             float fy = (float)get_sin(b->angle) / (1 << FIXED_SHIFT);
             b->dx = b->speed * fx;
             b->dy = b->speed * fy;
         }
-        // Ajustar posición afuera del muro
+    
         b->x = r + penetration;
     }
     else if (nextX + r > w) {

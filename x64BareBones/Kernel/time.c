@@ -32,7 +32,6 @@ dateStruct * get_time ()
     return &date;
 }
 
-// Sleep for at least the given number of microseconds
 void sleep(int microseconds) {
     unsigned long start = ticks;
     uint64_t ticks_to_wait = ((uint64_t)microseconds * 18 + 999999) / 1000000;

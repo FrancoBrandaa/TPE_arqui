@@ -15,10 +15,6 @@ extern uint8_t data;
 extern uint8_t bss;
 extern uint8_t endOfKernelBinary;
 extern uint8_t endOfKernel;
-extern void test_write();
-extern char read_minutes();
-extern char read_sec();
-extern char read_hours();
 
 static const uint64_t PageSize = 0x1000;
 
@@ -39,8 +35,8 @@ void * getStackBase()
 {
 	return (void*)(
 		(uint64_t)&endOfKernel
-		+ PageSize * 8				//The size of the stack itself, 32KiB
-		- sizeof(uint64_t)			//Begin at the top of the stack
+		+ PageSize * 8				
+		- sizeof(uint64_t)			
 	);
 }
 

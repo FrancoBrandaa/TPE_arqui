@@ -12,15 +12,11 @@ GLOBAL setEscFlag
 
 GLOBAL _irq00Handler
 GLOBAL _irq01Handler
-GLOBAL _irq02Handler
-GLOBAL _irq03Handler
-GLOBAL _irq04Handler
-GLOBAL _irq05Handler
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
 GLOBAL _int80Handler
 
-EXTERN getStackBase  ;esta en el kernel con su explicacion
+EXTERN getStackBase  
 EXTERN showRegisters  
 EXTERN irqDispatcher
 EXTERN syscallDispatcher
@@ -68,10 +64,10 @@ SECTION .text
 	pushState
     mov byte [esc_flag], 0
 
-	mov rdi, %1 ; pasaje de parametro
+	mov rdi, %1 
 	call irqDispatcher
 
-	; signal pic EOI (End of Interrupt)
+
 	mov al, 20h
 	out 20h, al
 
@@ -125,7 +121,7 @@ SECTION .text
     add rax, 8
     mov qword rdi, [rsp+16]   ; rflags
     mov qword [rax], rdi
-    mov byte [registers_saved], 1   ; seteo flag de que se guardaron registros [ESTO ESTABA MAL]
+    mov byte [registers_saved], 1    
 %endmacro
 
 %macro exceptionHandler 1
@@ -181,27 +177,13 @@ _irq00Handler:
 _irq01Handler:
 	irqHandlerMaster 1
 
-;Cascade pic never called
-_irq02Handler:
-	irqHandlerMaster 2
 
-;Serial Port 2 and 4
-_irq03Handler:
-	irqHandlerMaster 3
-
-;Serial Port 1 and 3
-_irq04Handler:
-	irqHandlerMaster 4
-
-;USB
-_irq05Handler:
-	irqHandlerMaster 5
 
 ;Zero Division Exception
 _exception0Handler:
 	exceptionHandler 0
 
-;Zero Division Exception
+;invalid operation Exception
 _exception6Handler:
 	exceptionHandler 6
 
@@ -228,7 +210,7 @@ saveRegisters:
     ret
 
 getRegisters:
-    mov rax, 0       ; ret null
+    mov rax, 0   
     cmp byte [registers_saved], 1
     jne .not_saved
     mov rax, regs_backup

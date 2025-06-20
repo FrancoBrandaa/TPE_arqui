@@ -67,10 +67,8 @@ struct vbe_mode_info_structure
 typedef struct vbe_mode_info_structure *VBEInfoPtr;
 VBEInfoPtr VBE_mode_info = (VBEInfoPtr)0x0000000000005C00;
 
-
-
-
-int getVbeInfo(neededInfo info){
+int getVbeInfo(neededInfo info)
+{
     if (VBE_mode_info == NULL) {
         // Manejo de error: VBE_mode_info no está inicializado
         return  1; 
@@ -132,10 +130,10 @@ void setFontColor(uint32_t hexColor)
 void replaceColor(uint32_t oldColor, uint32_t newColor)
 {
         // Reemplazar en el back buffer
-        for (int i = 0; i < BUFFER_WIDTH * BUFFER_HEIGHT; i++) {
-            if (backBuffer[i] == oldColor) {
+        for (int i = 0; i < BUFFER_WIDTH * BUFFER_HEIGHT; i++) 
+        {
+            if (backBuffer[i] == oldColor) 
                 backBuffer[i] = newColor;
-            }
         }
 }
 
@@ -199,6 +197,7 @@ void putChar(char c, FDS fd)
             drawChar(' ', cursorX, cursorY, color, backgroundColor, zoom);
         }
     }
+
     else
     {
         drawChar(c, cursorX, cursorY, color, backgroundColor, zoom);
@@ -235,24 +234,23 @@ void drawChar(unsigned char c, int x, int y, int fgcolor, int bgcolor, int mult)
 }
 
 
-
-
-
 void scrollScreen(void)
 {
         // Scroll en el back buffer
         uint32_t lines = CHAR_HEIGHT * zoom;
         uint32_t bytesToMove = (BUFFER_HEIGHT - lines) * BUFFER_WIDTH * sizeof(uint32_t);
         
-        // Mover líneas hacia arriba
-        for (uint32_t y = 0; y < BUFFER_HEIGHT - lines; y++) {
+        // Arriba
+        for (uint32_t y = 0; y < BUFFER_HEIGHT - lines; y++) 
+        {
             for (uint32_t x = 0; x < BUFFER_WIDTH; x++) {
                 backBuffer[y * BUFFER_WIDTH + x] = backBuffer[(y + lines) * BUFFER_WIDTH + x];
             }
         }
         
-        // Limpiar las líneas de abajo
-        for (uint32_t y = BUFFER_HEIGHT - lines; y < BUFFER_HEIGHT; y++) {
+        // Abajo
+        for (uint32_t y = BUFFER_HEIGHT - lines; y < BUFFER_HEIGHT; y++) 
+        {
             for (uint32_t x = 0; x < BUFFER_WIDTH; x++) {
                 backBuffer[y * BUFFER_WIDTH + x] = backgroundColor;
             }

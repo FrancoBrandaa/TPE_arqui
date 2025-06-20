@@ -85,10 +85,13 @@ int strLen(char * str) {
 }
 
 
-
-//agrandar el texto antes de llamar
-void showRegisters() {
+void showRegisters() 
+{
     uint64_t * reg = getRegisters();
+	if(reg == NULL) {
+		sysWrite(STDERR, "No se cargaron los registros, para cargarlos presione esc\n", 58);
+		return; 
+	}
     char  strs[][4] = {"rax:", "rbx:", "rcx:", "rdx:", "rdi:", "rsi:", "rsp:", "rbp:", "r8: ", "r9: ", "r10:", "r11:", "r12:", "r13:", "r14:", "r15:", "rip:", "cs: ", "rfl:"};
     char * buf = "\tRRRR 0xHHHHHHHHHHHHHHHH\n";
     for (int i = 0; i < 19; i++) {

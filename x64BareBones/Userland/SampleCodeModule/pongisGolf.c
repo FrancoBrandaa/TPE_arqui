@@ -139,7 +139,7 @@ void startPongis()
         }
         else if (c == '\n' || c == '\r')
         {
-            // 3) actúo según el índice seleccionado
+            //actuo segun el indice seleccionado
             switch (selected)
             {
             case 0:
@@ -151,7 +151,7 @@ void startPongis()
                 startGame(2);
                 break;
             case 2:
-                // Cambiar dificultad cíclicamente
+                // Cambiar dificultad ciclicamente
                 difficult = (difficult + 1) % 3;
                 drawMenu(selected);
                 break;
@@ -159,7 +159,7 @@ void startPongis()
                 shell();
                 return;
             }
-            if (selected != 2) // Solo retornar si no es la opción de dificultad
+            if (selected != 2) // Solo retornar si no es la opcion de dificultad
                 return;
         }
     }
@@ -212,7 +212,7 @@ void win(int numPlayers, int winner)
     }
 }
 
-// Función para mostrar Game Over
+// Funcion para mostrar Game Over
 void lose()
 {
     setBackGroundColor(black);
@@ -248,13 +248,13 @@ void lose()
     }
 }
 
-// Función para mostrar el contador de colisiones
+// Funcion para mostrar el contador de colisiones
 void drawCollisionCounter(int numPlayers)
 {
     setZoom(2);
     setFontColor(white);
 
-    // Posición en la esquina superior izquierda
+    // Posicion en la esquina superior izquierda
     setCursor(0, 0);
 
     print("J1: ");
@@ -325,27 +325,27 @@ Object ball = {
         .color = black};
 
     // Robot que orbita alrededor del hoyo
-    float orbitRadius = hole.radius + ROBOT_ORBIT_OFFSET; // Radio de órbita alrededor del hoyo
+    float orbitRadius = hole.radius + ROBOT_ORBIT_OFFSET; // Radio de orbita alrededor del hoyo
     Object robot = {
-        .x = x_hole + orbitRadius, // Posición inicial en la órbita
+        .x = x_hole + orbitRadius, // Posicion inicial en la orbita
         .y = y_hole,
         .dx = 0.0f,
         .dy = 0.0f,
         .speed = ROBOT_SPEED, // Velocidad angular del robot
-        .angle = 0.0f, // Ángulo orbital inicial
+        .angle = 0.0f, // Angulo orbital inicial
         .radius = ROBOT_RADIUS,
         .color = darkGrey};
 
     float threshold = hole.radius - BALL_THRESHOLD_FACTOR * ball.radius;
     float threshold2 = threshold * threshold;
 
-    float robotOrbitAngle = 0.0f; // Ángulo para la órbita del robot
+    float robotOrbitAngle = 0.0f; // Angulo para la orbita del robot
 
 
     while (1)
     {
-        // ESC para volver al menú
-        if (getChar() == KEY_ESC)
+        // ESC para volver al menu
+        if (getChar() == 'q')  //KEY_ESC
         {
             player1_collisions = 0;
             player2_collisions = 0;
@@ -373,11 +373,11 @@ Object ball = {
         }
 
         // Actualizar movimiento orbital del robot
-        robotOrbitAngle += robot.speed; // Incrementar ángulo orbital
+        robotOrbitAngle += robot.speed; // Incrementar angulo orbital
         if (robotOrbitAngle >= 360.0f)
             robotOrbitAngle -= 360.0f;
 
-        // Calcular nueva posición del robot en órbita circular
+        // Calcular nueva posicion del robot en orbita circular
         float fx_orbit = (float)get_cos((int)robotOrbitAngle) / (1 << FIXED_SHIFT);
         float fy_orbit = (float)get_sin((int)robotOrbitAngle) / (1 << FIXED_SHIFT);
         
@@ -386,7 +386,7 @@ Object ball = {
 
         updateObject(&robot);
 
-        // Dibujar hoyo (croto mal)
+        // Dibujar hoyo 
         for (int dy = -(int)hole.radius; dy <= (int)hole.radius; dy++)
         {
             for (int dx = -(int)hole.radius; dx <= (int)hole.radius; dx++)
@@ -424,12 +424,12 @@ Object ball = {
 
         updateObject(&ball);
 
-        // Colisión robot con pelota
+        // Colision robot con pelota
         if (checkCollision(&robot, &ball))
         {
-            // El robot empuja la pelota en dirección aleatoria
+            // El robot empuja la pelota en direccion aleatoria
             int pushAngle = rand() % 360;
-            ball.speed = 8.0f; // Velocidad del empujón
+            ball.speed = 8.0f; // Velocidad del empujon
             ball.angle = pushAngle;
 
             float fx = (float)get_cos(ball.angle) / (1 << FIXED_SHIFT);
@@ -608,12 +608,12 @@ Object ball = {
             playTone(659, 200);
             playTone(784, 400);
 
-            // Determinar quién hizo el último toque
+            // Determinar quien hizo el ultimo toque
             int winner = 1; // Por defecto jugador 1
 
             if (numPlayers == 2)
             {
-                // Verificar quién está más cerca de la pelota para determinar el ganador
+                // Verificar quien esta mas cerca de la pelota para determinar el ganador
                 float dist1 = (player1.x - ball.x) * (player1.x - ball.x) + (player1.y - ball.y) * (player1.y - ball.y);
                 float dist2_p = (player2.x - ball.x) * (player2.x - ball.x) + (player2.y - ball.y) * (player2.y - ball.y);
 

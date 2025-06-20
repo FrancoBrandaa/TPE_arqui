@@ -96,12 +96,10 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint64_t delay = va_arg(args, uint64_t);
         playTone(frecuency,delay);
     }else if(rax == SYSNUM_VBE_INFO){
-        neededInfo x = va_arg(args, neededInfo); //puntero a structura
-        ret = getVbeInfo(x); //cero si funca bien
+        neededInfo x = va_arg(args, neededInfo); 
+        ret = getVbeInfo(x); 
     }else if (rax == SYSNUM_IS_KEY_PRESSED) {
-        // El usuario pasa un keyCode (ASCII 0..127) y devolvemos 1 si está presionado o 0 si no.
         int keyCode = (int)va_arg(args, uint64_t);
-        // Llamamos a la función de teclado que definimos en keyboardDriver.c
         ret = (uint64_t) isKeyPressed(keyCode);
     } else if (rax == SYSNUM_SWAP_BUFFERS) {
         swapBuffers();

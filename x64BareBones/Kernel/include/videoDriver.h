@@ -4,7 +4,6 @@
 #include <lib.h>
 #ifndef VIDEODRIVER_H
 #define VIDEODRIVER_H
-// Function declarations and macros for the video driver
 
 
 struct vbeInfo {
@@ -60,13 +59,14 @@ void scrollScreen(void);
 void setCursor(int x, int y);
 void setFontColor(uint32_t newColor);
 void SetBackgroundColor(uint32_t newColor);
+
 // Double Buffering Functions
 void swapBuffers(void);
 void clearBackBuffer(uint32_t hexColor);
 
 
-static uint8_t font_bitmap[256 * CHAR_HEIGHT] = {
-    // Relleno para las primeras letras (Espacio, símbolos, etc.)
+static uint8_t font_bitmap[256 * CHAR_HEIGHT] = 
+{
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -1779,8 +1779,6 @@ static uint8_t font_bitmap[256 * CHAR_HEIGHT] = {
     0b00000000,
     0b00000000,
     0b00000000,
-
-    // Seguir con el resto de caracteres...
 };
 
 
