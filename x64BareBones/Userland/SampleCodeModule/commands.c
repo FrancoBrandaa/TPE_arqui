@@ -1,11 +1,22 @@
 #include <commands.h>
 
-
 int runCommand(const char *input)
 {
+    // Limpiar el input eliminando espacios y caracteres ESC
+    char cleanedInput[COMMAND_DIM];
+    int i = 0, j = 0;
     
+    while (input[i] != '\0') {
+        // Skip spaces and ESC characters
+        if (input[i] != ' ' && input[i] != 27) {
+            cleanedInput[j] = input[i];
+            j++;
+        }
+        i++;
+    }
+    cleanedInput[j] = '\0'; // Null terminate
 
-    if (strcmp(input, "help") == 0)
+    if (strcmp(cleanedInput, "help") == 0)
     {
         print("Comandos disponibles:\n");
         print(" - help\n");
@@ -21,13 +32,14 @@ int runCommand(const char *input)
         return 1;
     }
 
-    if (strcmp(input, "clear") == 0)
+    if (strcmp(cleanedInput, "clear") == 0)
     {
         cleanScreen();
         print("Los Monos TPE!\n");
         return 2;
     }
 
+    // Para echo usar el input original para preservar espacios en el mensaje
     if (strncmp(input, "echo ", 5) == 0)
     {
         print(input + 5);
@@ -35,84 +47,88 @@ int runCommand(const char *input)
         return 3;
     }
 
-    if (strcmp(input, "date") == 0)
+    if (strcmp(cleanedInput, "date") == 0)
     {
         printDate();
         return 4;
     }
 
-    if (strcmp(input, "div0") == 0)
+    if (strcmp(cleanedInput, "div0") == 0)
     {
         _div();
         return 5;
     }
 
-    if (strcmp(input, "invop") == 0)
+    if (strcmp(cleanedInput, "invop") == 0)
     {
         _ioe();
         return 6;
     }
 
-    if (strcmp(input, "pg") == 0 || strcmp(input, "pongis golf") == 0)
+    if (strcmp(cleanedInput, "pg") == 0 || strcmp(cleanedInput, "pongisgolf") == 0)
     {
         startPongis();
         return 7;
     }
 
-    if (strcmp(input, "registers") == 0)
+    if (strcmp(cleanedInput, "registers") == 0)
     {
         printRegisters();
         return 8;
     }
 
+    // Para comandos con argumentos, limpiar también
     if (strncmp(input, "zoom ", 5) == 0)
     {
-        int new_zoom = atoi(input + 5);// atoi esta en el libc.c
-            if (new_zoom < ZOOM_MIN || new_zoom > ZOOM_MAX)
-            {
-                print("New Zoom not valid!\n");
-                return 7;
+        // Limpiar el argumento del zoom
+        char cleanedZoom[COMMAND_DIM];
+        int k = 5, l = 0; // Empezar después de "zoom "
+        
+        while (input[k] != '\0') {
+            if (input[k] != ' ' && input[k] != 27) {
+                cleanedZoom[l] = input[k];
+                l++;
             }
-            setZoom(new_zoom);
-            cleanScreen();
-            print("Zoom set to ");
-            print(input + 5);
-            print("\n");
+            k++;
+        }
+        cleanedZoom[l] = '\0';
+        
+        int new_zoom = atoi(cleanedZoom);
+        if (new_zoom < ZOOM_MIN || new_zoom > ZOOM_MAX)
+        {
+            print("New Zoom not valid!\n");
+            return 9;
+        }
+        setZoom(new_zoom);
+        cleanScreen();
+        print("Zoom set to ");
+        print(cleanedZoom);
+        print("\n");
         return 9;
     }
 
-    
     if (strncmp(input, "color ", 6) == 0)
     {
-        const char *colorName = input + 6;
+        // Limpiar el argumento del color
+        char cleanedColor[COMMAND_DIM];
+        int k = 6, l = 0; // Empezar después de "color "
+        
+        while (input[k] != '\0') {
+            if (input[k] != ' ' && input[k] != 27) {
+                cleanedColor[l] = input[k];
+                l++;
+            }
+            k++;
+        }
+        cleanedColor[l] = '\0';
+        
         uint32_t colorValue = white; 
 
-        if (strcmp(colorName, "black") == 0) colorValue = black;
-        else if (strcmp(colorName, "white") == 0) colorValue = white;
-        else if (strcmp(colorName, "blue") == 0) colorValue = blue;
-        else if (strcmp(colorName, "green") == 0) colorValue = green;
-        else if (strcmp(colorName, "red") == 0) colorValue = red;
-        else if (strcmp(colorName, "yellow") == 0) colorValue = yellow;
-        else if (strcmp(colorName, "purple") == 0) colorValue = purple;
-        else if (strcmp(colorName, "cyan") == 0) colorValue = cyan;
-        else if (strcmp(colorName, "orange") == 0) colorValue = orange;
-        else if (strcmp(colorName, "pink") == 0) colorValue = pink;
-        else if (strcmp(colorName, "brown") == 0) colorValue = brown;
-        else if (strcmp(colorName, "lightGrey") == 0) colorValue = lightGrey;
-        else if (strcmp(colorName, "lightBlue") == 0) colorValue = lightBlue;
-        else if (strcmp(colorName, "lightGreen") == 0) colorValue = lightGreen;
-        else if (strcmp(colorName, "lightRed") == 0) colorValue = lightRed;
-        else if (strcmp(colorName, "lightPink") == 0) colorValue = lightPink;
-        else if (strcmp(colorName, "lightBrown") == 0) colorValue = lightBrown;
-        else if (strcmp(colorName, "darkBlue") == 0) colorValue = darkBlue;
-        else if (strcmp(colorName, "darkGreen") == 0) colorValue = darkGreen;
-        else if (strcmp(colorName, "darkRed") == 0) colorValue = darkRed;
-        else if (strcmp(colorName, "darkYellow") == 0) colorValue = darkYellow;
-        else if (strcmp(colorName, "darkPurple") == 0) colorValue = darkPurple;
-        else if (strcmp(colorName, "darkCyan") == 0) colorValue = darkCyan;
-        else if (strcmp(colorName, "darkOrange") == 0) colorValue = darkOrange;
-        else if (strcmp(colorName, "darkPink") == 0) colorValue = darkPink;
-        else if (strcmp(colorName, "darkBrown") == 0) colorValue = darkBrown;
+        if (strcmp(cleanedColor, "black") == 0) colorValue = black;
+        else if (strcmp(cleanedColor, "white") == 0) colorValue = white;
+        else if (strcmp(cleanedColor, "blue") == 0) colorValue = blue;
+        else if (strcmp(cleanedColor, "green") == 0) colorValue = green;
+        else if (strcmp(cleanedColor, "red") == 0) colorValue = red;
         else {
             print("Color no reconocido\n");
             return 10;
