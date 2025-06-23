@@ -93,7 +93,10 @@ SECTION .text
     add rax, 8
     mov qword [rax], rsi
     add rax, 8
-    mov qword [rax], rsp
+    ;catcheo de rsp anterior (tomanba el actual, error!)
+    ;mov qword [rax], rsp
+    mov qword rdi, [rsp+24]    ; rsp
+    mov qword [rax], rdi
     add rax, 8
     mov qword [rax], rbp
     add rax, 8
