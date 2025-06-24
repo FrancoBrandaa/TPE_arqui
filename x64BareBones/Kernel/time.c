@@ -1,5 +1,6 @@
 #include <time.h>
 #include <stdint.h>
+#include <interrupts.h>
 
 static unsigned long ticks = 0;
 static dateStruct date;

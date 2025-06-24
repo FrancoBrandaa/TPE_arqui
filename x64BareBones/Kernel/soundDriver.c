@@ -10,8 +10,6 @@ void playTone(int frequency, int duration_ms)
 {
     unsigned int divisor;
     unsigned char tmp;
-    unsigned long start_ticks;
-    unsigned long ticks_to_wait;
 
     divisor = 1193180 / frequency;
 

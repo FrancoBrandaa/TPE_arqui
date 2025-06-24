@@ -1,6 +1,7 @@
 #include <syscallDispatcher.h>
-
+#include <videoDriver.h>
 extern uint64_t * getRegisters();
+int nextKey();
 
 #define SYSNUM_READ 0
 #define SYSNUM_WRITE 1
@@ -44,15 +45,15 @@ size_t sysRead(FDS fd, char *buf, size_t count) {
     return 0;
 }
 
-void syscallDispatcher(uint64_t rax, ...) {
+uint64_t syscallDispatcher(uint64_t rax, ...) {
     va_list args;
     va_start(args, rax);
-    uint64_t ret;
+    uint64_t ret = 0;
     if (rax == SYSNUM_READ) {
-       uint64_t fd = va_arg(args, uint64_t);
-       uint64_t buf = va_arg(args, uint64_t);
+        uint64_t fd = va_arg(args, uint64_t);
+        uint64_t buf = va_arg(args, uint64_t);
         uint64_t count = va_arg(args, uint64_t);
-        ret = sysRead(fd, buf, count);
+        ret = sysRead(fd, (char *)buf, count);
     } else if (rax == SYSNUM_WRITE) {
         FDS fd = va_arg(args, FDS);
         const char * buf = va_arg(args, const char*);
@@ -70,7 +71,7 @@ void syscallDispatcher(uint64_t rax, ...) {
         uint32_t hexColor = va_arg(args, uint32_t);
         SetBackgroundColor(hexColor);
     }else if(rax == SYSNUM_GET_DATE){
-        ret = get_time();
+        ret = (uint64_t)get_time();
     }else if (rax == SYSNUM_SLEEP) {
         int microseconds = va_arg(args, int);
         sleep(microseconds);  

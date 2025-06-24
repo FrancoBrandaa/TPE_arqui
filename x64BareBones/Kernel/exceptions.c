@@ -6,6 +6,7 @@
 #define INVALID_OPCODE 6
 static void zero_division();
 static void invalid_opcode();
+void printError(char * msg);
 
 void waitToReturn() {
     char c;

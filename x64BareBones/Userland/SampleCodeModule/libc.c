@@ -40,12 +40,12 @@ int initScreenSize(void) {
 }
 //le paso un puntero a la estructura a llenar y si me retorna 0 es que lo lleno correctamente
 int getVbeInfo(neededInfo info){
-    return  sysCall(VBE_GET_INFO, info, 0, 0,0);
+    return sysCall(VBE_GET_INFO, (uint64_t)info, 0, 0,0);
 }
 
 int isKeyPressed (int keyCode) 
 {
-    return  sysCall(IS_KEY_PRESSED, keyCode, 0, 0, 0);
+    return sysCall(IS_KEY_PRESSED, keyCode, 0, 0, 0);
 }
 
 void playTone(uint64_t frequency,uint64_t duration_ms) {
@@ -71,7 +71,7 @@ void printRegisters()
 
 dateStruct *getDate()
 {
-    dateStruct *date =  sysCall(GET_DATE, 0, 0, 0,0);
+    dateStruct *date = (dateStruct *)sysCall(GET_DATE, 0, 0, 0,0);
     return date;
 }
 

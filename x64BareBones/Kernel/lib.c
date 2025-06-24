@@ -1,5 +1,6 @@
-
 #include <lib.h>
+
+void sysWrite(FDS fd, const char *buf, size_t count);
 
 void * memset(void * destination, int32_t c, uint64_t length)
 {
